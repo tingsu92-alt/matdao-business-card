@@ -128,22 +128,21 @@ details .designer-fields{margin:12px 0}
 <form id="card-form" class="form-body" novalidate>
 <div class="fields bilingual-fields">
 <label><span>中文姓名</span><input name="name" placeholder="请输入中文姓名" maxlength="30" autocomplete="name" required></label>
-<div class="role-field"><label for="role"><span>中文职位</span></label><input id="role" name="role" placeholder="如 职位一  职位二" aria-describedby="role-help" maxlength="80" autocomplete="organization-title" required><small id="role-help" class="role-hint">多个职位请用空格分隔，如 职位一　职位二。</small></div>
+<div class="role-field"><label for="role"><span>中文职位</span></label><input id="role" name="role" placeholder="多个职位请用空格分隔" maxlength="80" autocomplete="organization-title" required></div>
 <label><span>电话</span><input name="phone" type="tel" placeholder="请输入联系电话" maxlength="36" autocomplete="tel" required></label>
 <label><span>邮箱</span><input name="email" type="email" placeholder="请输入工作邮箱" maxlength="110" autocomplete="email" required></label>
 </div>
-<details class="optional-fields" open>
-<summary>其他信息 <span>选填</span></summary>
+<div class="optional-fields">
 <div class="fields language-fields">
-<label class="contact"><span>中文</span><textarea name="affiliation" rows="2" maxlength="240" placeholder="请输入其他信息，可换行">可信数据空间发展联盟 新材料特设组组长</textarea></label>
+<label class="contact"><span>其他信息（选填）</span><textarea name="affiliation" rows="2" maxlength="240" placeholder="请输入其他信息，可换行">可信数据空间发展联盟 新材料特设组组长</textarea></label>
 
 </div>
-</details>
+</div>
 <details id="english-fields" class="optional-fields">
 <summary>英文信息 <span>选填 · 仅制作英文名片时填写</span></summary>
 <div class="fields language-fields">
 <label><span>英文姓名</span><input name="nameEn" placeholder="请输入英文姓名" maxlength="60" autocomplete="off"></label>
-<div class="role-field"><label for="role-en"><span>英文职位</span></label><input id="role-en" name="roleEn" placeholder="如 Title A  Title B" aria-describedby="role-help-en" maxlength="100"><small id="role-help-en" class="role-hint">多个职位请用空格分隔，如 职位一　职位二。</small></div>
+<div class="role-field"><label for="role-en"><span>英文职位</span></label><input id="role-en" name="roleEn" placeholder="多个职位请用空格分隔" maxlength="100"></div>
 <label class="contact"><span>其他信息（英文）</span><textarea name="affiliationEn" rows="2" maxlength="420" placeholder="Enter other information on separate lines" lang="en">Chair of the New Materials Task Force, Trusted Data Space Development Alliance</textarea></label>
 </div>
 </details>
