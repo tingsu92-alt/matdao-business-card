@@ -112,6 +112,8 @@ details .designer-fields{margin:12px 0}
 .phone-save{width:min(760px,calc(100% - 24px));max-height:calc(100dvh - 24px);padding:20px;border:1px solid var(--line);border-radius:18px;background:#fff;color:var(--ink);overflow:auto;overscroll-behavior:contain}.phone-save::backdrop{background:#15151599}.phone-save-head{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:12px}.phone-save-images{display:grid;gap:24px;margin:18px 0}.phone-save-images figure{margin:0}.phone-save-images figcaption{font-size:12px;color:var(--muted);margin-bottom:8px}.phone-save-images img{display:block;width:100%;height:auto;object-fit:contain;border-radius:12px;background:repeating-conic-gradient(#f1f1f1 0% 25%,#fff 0% 50%) 0/16px 16px;-webkit-touch-callout:default;user-select:auto;-webkit-user-select:auto}.phone-save-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.phone-save-help{margin-bottom:12px}.phone-save #phone-save-status{margin-top:10px}@media(max-width:720px){.export-bar{flex-wrap:wrap}.export-bar #export-note{order:3;flex-basis:100%}.phone-save{padding:16px}.phone-save-actions{flex-direction:column;align-items:stretch}.phone-save-head{position:sticky;top:-16px;background:#fff;padding:8px 0;z-index:1}}
 /* Keep focused form controls readable on touch devices without triggering iPhone input zoom. */
 @media(max-width:720px),(hover:none) and (pointer:coarse){input,select,.optional-fields textarea{font-size:16px;min-height:44px}input,select,textarea,.fields>label{min-width:0}.fields>label,.role-field{max-width:100%}}
+
+.language-fields{grid-template-columns:repeat(2,minmax(0,1fr))}.language-fields .contact{grid-column:1/-1}@media(max-width:440px){.language-fields{grid-template-columns:1fr}}
 </style>
 </head>
 <body class="employee-page">
@@ -127,19 +129,25 @@ details .designer-fields{margin:12px 0}
 <div class="fields bilingual-fields">
 <label><span>中文姓名</span><input name="name" placeholder="请输入中文姓名" maxlength="30" autocomplete="name" required></label>
 <div class="role-field"><label for="role"><span>中文职位</span></label><input id="role" name="role" placeholder="如 职位一  职位二" aria-describedby="role-help" maxlength="80" autocomplete="organization-title" required><small id="role-help" class="role-hint">多个职位请用空格分隔，如 职位一　职位二。</small></div>
-<label><span>英文姓名</span><input name="nameEn" placeholder="请输入英文姓名" maxlength="60" autocomplete="off"></label>
-<div class="role-field"><label for="role-en"><span>英文职位</span></label><input id="role-en" name="roleEn" placeholder="如 Title A  Title B" aria-describedby="role-help-en" maxlength="100"><small id="role-help-en" class="role-hint">多个职位请用空格分隔，如 职位一　职位二。</small></div>
-<label class="contact"><span>电话</span><input name="phone" type="tel" placeholder="请输入联系电话" maxlength="36" autocomplete="tel" required></label>
-<label class="contact"><span>邮箱</span><input name="email" type="email" placeholder="请输入工作邮箱" maxlength="110" autocomplete="email" required></label>
+<label><span>电话</span><input name="phone" type="tel" placeholder="请输入联系电话" maxlength="36" autocomplete="tel" required></label>
+<label><span>邮箱</span><input name="email" type="email" placeholder="请输入工作邮箱" maxlength="110" autocomplete="email" required></label>
 </div>
 <details class="optional-fields" open>
 <summary>其他信息 <span>选填</span></summary>
-<div class="fields bilingual-fields">
+<div class="fields language-fields">
 <label class="contact"><span>中文</span><textarea name="affiliation" rows="2" maxlength="240" placeholder="请输入其他信息，可换行">可信数据空间发展联盟 新材料特设组组长</textarea></label>
-<label class="contact"><span>英文</span><textarea name="affiliationEn" rows="2" maxlength="420" placeholder="Enter other information on separate lines" lang="en">Chair of the New Materials Task Force, Trusted Data Space Development Alliance</textarea></label>
+
 </div>
 </details>
-<div class="form-foot"><p id="form-status" class="note" role="status">电话和邮箱两版共用。按需填写对应语言的姓名和职位。</p><button class="primary" type="submit">确定信息</button></div>
+<details id="english-fields" class="optional-fields">
+<summary>英文信息 <span>选填 · 仅制作英文名片时填写</span></summary>
+<div class="fields language-fields">
+<label><span>英文姓名</span><input name="nameEn" placeholder="请输入英文姓名" maxlength="60" autocomplete="off"></label>
+<div class="role-field"><label for="role-en"><span>英文职位</span></label><input id="role-en" name="roleEn" placeholder="如 Title A  Title B" aria-describedby="role-help-en" maxlength="100"><small id="role-help-en" class="role-hint">多个职位请用空格分隔，如 职位一　职位二。</small></div>
+<label class="contact"><span>其他信息（英文）</span><textarea name="affiliationEn" rows="2" maxlength="420" placeholder="Enter other information on separate lines" lang="en">Chair of the New Materials Task Force, Trusted Data Space Development Alliance</textarea></label>
+</div>
+</details>
+<div class="form-foot"><p id="form-status" class="note" role="status">默认只需填写中文信息。需要英文名片时，展开「英文信息」填写；电话和邮箱两版共用。</p><button class="primary" type="submit">确定信息</button></div>
 </form>
 </section>
 <section class="panel" aria-labelledby="preview-title">
@@ -479,7 +487,7 @@ const sample = {zh:SAMPLE,en:EN_SAMPLE};
 const names = {zh:['name','role'],en:['nameEn','roleEn']};
 const affiliations = {zh:'affiliation',en:'affiliationEn'};
 const choice = $('download-language');
-const idle = '电话和邮箱两版共用。按需填写对应语言的姓名和职位。';
+const idle = '默认只需填写中文信息。需要英文名片时，展开「英文信息」填写；电话和邮箱两版共用。';
 let mode='business';
 
 function field(key){return form.elements.namedItem(key);}
@@ -510,7 +518,12 @@ function check(languages){
     input.setCustomValidity(input.required&&!value(key)?'请填写'+input.labels[0].firstElementChild.textContent:'');
   }
   const invalid=keys.map(field).find(input=>!input.validity.valid);
-  if(invalid){invalid.reportValidity();return false;}
+  if(invalid){
+    for(let parent=invalid.parentElement;parent&&parent!==form;parent=parent.parentElement){
+      if(parent.tagName==='DETAILS') parent.open=true;
+    }
+    invalid.reportValidity();return false;
+  }
   return true;
 }
 form.addEventListener('input',event=>{
@@ -526,6 +539,7 @@ form.addEventListener('submit',event=>{
 bindSwitch(next=>{mode=next;preview();});
 choice.addEventListener('change',()=>{
   const both=choice.value==='both';
+  if(choice.value==='en'||both) $('english-fields').open=true;
   $('download-label').textContent=both?'下载 ZIP':'下载 PNG';
   $('export-note').textContent=both?'ZIP 内含两张透明圆角 PNG。':'PNG 图片保留透明圆角。';
   status(idle);

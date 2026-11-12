@@ -5,7 +5,7 @@ const sample = {zh:SAMPLE,en:EN_SAMPLE};
 const names = {zh:['name','role'],en:['nameEn','roleEn']};
 const affiliations = {zh:'affiliation',en:'affiliationEn'};
 const choice = $('download-language');
-const idle = '电话和邮箱两版共用。按需填写对应语言的姓名和职位。';
+const idle = '默认只需填写中文信息。需要英文名片时，展开「英文信息」填写；电话和邮箱两版共用。';
 let mode='business';
 
 function field(key){return form.elements.namedItem(key);}
@@ -36,7 +36,12 @@ function check(languages){
     input.setCustomValidity(input.required&&!value(key)?'请填写'+input.labels[0].firstElementChild.textContent:'');
   }
   const invalid=keys.map(field).find(input=>!input.validity.valid);
-  if(invalid){invalid.reportValidity();return false;}
+  if(invalid){
+    for(let parent=invalid.parentElement;parent&&parent!==form;parent=parent.parentElement){
+      if(parent.tagName==='DETAILS') parent.open=true;
+    }
+    invalid.reportValidity();return false;
+  }
   return true;
 }
 form.addEventListener('input',event=>{
@@ -52,6 +57,7 @@ form.addEventListener('submit',event=>{
 bindSwitch(next=>{mode=next;preview();});
 choice.addEventListener('change',()=>{
   const both=choice.value==='both';
+  if(choice.value==='en'||both) $('english-fields').open=true;
   $('download-label').textContent=both?'下载 ZIP':'下载 PNG';
   $('export-note').textContent=both?'ZIP 内含两张透明圆角 PNG。':'PNG 图片保留透明圆角。';
   status(idle);
