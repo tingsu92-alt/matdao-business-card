@@ -6,7 +6,7 @@ const names = {zh:['name','role'],en:['nameEn','roleEn']};
 const affiliations = {zh:'affiliation',en:'affiliationEn'};
 const choice = $('download-language');
 const idle = '默认只需填写中文信息。需要英文名片时，展开「英文信息」填写；电话和邮箱两版共用。';
-let mode='business';
+let mode='regular';
 
 function field(key){return form.elements.namedItem(key);}
 function value(key){return field(key).value.trim();}
