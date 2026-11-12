@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>设计师配置 · 新材道电子名片</title>
+<style>/*__CSS__*/</style>
+</head>
+<body>
+<header class="top"><div class="bar">
+<div class="brand"><span class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="m8 15 2-.5 6-6-1.5-1.5-6 6z" stroke-linejoin="round"/></svg></span>新材道电子名片</div>
+<a class="top-link" href="https://tingsu92-alt.github.io/matdao-business-card/" target="_blank" rel="noopener">打开员工网页 ↗</a>
+</div></header>
+<main>
+<section class="hero" aria-labelledby="title">
+<div><div class="kicker">TEMPLATE STUDIO</div><h1 id="title">设计师配置</h1><p>分别配置两套样式，每套样式共用一组配色和素材，可单独设置中英文文案。</p></div>
+<div class="switch" role="group" aria-label="编辑名片版本"><button data-mode="business" aria-pressed="true">商务版</button><button data-mode="regular" aria-pressed="false">常规版</button></div>
+</section>
+<div class="designer-grid">
+<section class="panel" aria-labelledby="settings-title">
+<div class="panel-head"><div class="heading"><span class="step">01</span><h2 id="settings-title">配置模板</h2></div><span class="pill" id="editing">商务版</span></div>
+<div class="form-body">
+<p class="note" style="margin-bottom:14px">建议从 Illustrator 导出 1680 × 960 px 的背景 PNG，给员工信息留出位置。背景已包含品牌元素时，可清空对应文字。</p>
+<div id="settings" class="designer-fields">
+<div class="upload wide"><label>背景图<input type="file" id="background" accept="image/png,image/jpeg,image/webp"></label><button class="secondary" type="button" data-remove="background">移除</button></div>
+<div class="upload wide"><label>商务版 Logo<input type="file" id="logo-business" accept="image/png,image/jpeg,image/webp"></label><button class="secondary" type="button" data-remove="logo-business" aria-label="移除商务版 Logo">移除</button></div>
+<div class="logo-thumbnail wide" id="logo-business-state" hidden><img id="logo-business-thumbnail" alt="商务版 Logo 文件缩略图"></div>
+<div class="upload wide"><label>常规版 Logo<input type="file" id="logo-regular" accept="image/png,image/jpeg,image/webp"></label><button class="secondary" type="button" data-remove="logo-regular" aria-label="移除常规版 Logo">移除</button></div>
+<div class="logo-thumbnail wide" id="logo-regular-state" hidden><img id="logo-regular-thumbnail" alt="常规版 Logo 文件缩略图"></div>
+<div class="upload wide"><label>二维码<input type="file" id="qr" accept="image/png,image/jpeg,image/webp"></label><button class="secondary" type="button" data-remove="qr">移除</button></div>
+<label class="wide">公司全称<input id="company" maxlength="32"></label>
+<label class="wide">公司地址<input id="address" maxlength="90"></label>
+<label class="wide">公司口号<input id="slogan" maxlength="65"></label>
+<label class="wide">英文公司全称<input id="companyEn" maxlength="80"></label>
+<label class="wide">英文公司地址<input id="addressEn" maxlength="110"></label>
+<label class="wide">英文公司口号<input id="sloganEn" maxlength="90"></label>
+<label>主文字颜色<input id="ink" type="color"></label>
+<label>辅助文字颜色<input id="muted" type="color"></label>
+<label>强调色（商务版同步 Logo）<input id="accent" type="color"></label>
+<label>圆角半径（0–120 px）<input id="radius" type="number" min="0" max="120" step="1"></label>
+</div>
+<details><summary>调整元素的位置和大小</summary>
+<p class="note" style="margin-top:8px">位置和宽度以画布百分比表示，文字字号以画布高度的百分比表示。</p>
+<div id="layout" class="designer-fields"></div>
+</details>
+<p id="status" role="status" class="note template-status"></p>
+</div>
+</section>
+<section class="panel" aria-labelledby="template-preview">
+<div class="panel-head"><div class="heading"><span class="step">02</span><h2 id="template-preview">预览并交付</h2></div><span class="pill live">实时预览</span></div>
+<div class="stage designer-preview">
+<figure><figcaption>中文名片</figcaption><canvas id="card-zh" width="1680" height="960" aria-label="中文模板预览"></canvas></figure>
+<figure><figcaption>英文名片</figcaption><canvas id="card-en" width="1680" height="960" aria-label="英文模板预览"></canvas></figure>
+<p class="caption"><span id="mode-label">商务版</span><span>示例员工信息</span></p>
+</div>
+<div class="form-body">
+<p class="note">此配置台仅供你的 GitHub 私有工作区使用。确认模板后点「保存并发布」，等待 GitHub Pages 完成发布，员工原网址会自动更新。</p>
+<div class="actions"><button class="primary" type="button" id="publish">保存并发布</button></div>
+<details><summary>备份与恢复模板</summary>
+<div class="actions"><button class="secondary" type="button" id="backup">下载模板备份</button></div>
+<div class="designer-fields"><label class="wide">导入模板备份（替换两版）<input type="file" id="restore" accept="application/json,.json"></label></div>
+</details>
+</div>
+</section>
+</div>
+<footer class="footer"><span>新材道电子名片 · TEMPLATE STUDIO</span><span>保存并发布会同步到 GitHub，员工网址保持不变</span></footer>
+</main>
+<script>/*__DESIGNER_SESSION__*/</script>
+<script>/*__CARD__*/</script>
+<script>/*__PAGE__*/</script>
+</body>
+</html>
