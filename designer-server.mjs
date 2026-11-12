@@ -62,7 +62,7 @@ const server=createServer(async(req,res)=>{
   }
   if(req.method==='GET'&&path==='/health'){send(res,200,{ready:true});return;}
   if(req.method!=='POST'||path!=='/api/publish'){send(res,404,{error:'未找到页面。'});return;}
-  if((req.headers.origin&&!new Set([origin,'http://localhost:8765','http://127.0.0.1:8765']).has(req.headers.origin))||!validToken(req.headers['x-designer-session'])){console.warn('Rejected designer request',JSON.stringify({origin:req.headers.origin,expectedOrigin:origin,hasSession:typeof req.headers['x-designer-session']==='string',validSession:validToken(req.headers['x-designer-session'])}));send(res,403,{error:'当前页面验证已失效，请刷新配置台。'});return;}
+  if((req.headers.origin&&!new Set([origin,'http://localhost:8765','http://127.0.0.1:8765','https://localhost:8765','https://127.0.0.1:8765']).has(req.headers.origin))||!validToken(req.headers['x-designer-session'])){console.warn('Rejected designer request',JSON.stringify({origin:req.headers.origin,expectedOrigin:origin,hasSession:typeof req.headers['x-designer-session']==='string',validSession:validToken(req.headers['x-designer-session'])}));send(res,403,{error:'当前页面验证已失效，请刷新配置台。'});return;}
   if(localTest){send(res,403,{error:'本地检查模式禁止发布。'});return;}
   if(publishing){send(res,409,{error:'另一项发布正在进行，请稍后重试。'});return;}
   if(!req.headers['content-type']?.startsWith('application/json')){send(res,415,{error:'请求格式不正确。'});return;}
