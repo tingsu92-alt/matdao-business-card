@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="填写个人信息，实时预览并下载两种样式的电子名片。">
+<title>新材道电子名片</title>
+<style>/*__CSS__*/</style>
+</head>
+<body class="employee-page">
+<!--__DESIGNER_LINK__-->
+<main>
+<section class="hero" aria-labelledby="title">
+<div><div class="kicker">CARD STUDIO</div><h1 id="title">新材道电子名片</h1><p>填写个人信息，预览并下载你的电子名片。</p></div>
+<div class="switch" role="group" aria-label="名片版本"><button data-mode="business" aria-pressed="true">商务版</button><button data-mode="regular" aria-pressed="false">常规版</button></div>
+</section>
+<section class="panel" aria-labelledby="info-title">
+<div class="panel-head"><div class="heading"><span class="step">01</span><h2 id="info-title">填写个人信息</h2></div><span class="meta">按下载语言填写</span></div>
+<form id="card-form" class="form-body" novalidate>
+<div class="fields bilingual-fields">
+<label><span>中文姓名</span><input name="name" placeholder="请输入中文姓名" maxlength="30" autocomplete="name" required></label>
+<div class="role-field"><label for="role"><span>中文职位</span></label><input id="role" name="role" placeholder="如 职位一  职位二" aria-describedby="role-help" maxlength="80" autocomplete="organization-title" required><small id="role-help" class="role-hint">多个职位请用空格分隔，如 职位一　职位二。</small></div>
+<label><span>英文姓名</span><input name="nameEn" placeholder="请输入英文姓名" maxlength="60" autocomplete="off"></label>
+<div class="role-field"><label for="role-en"><span>英文职位</span></label><input id="role-en" name="roleEn" placeholder="如 Title A  Title B" aria-describedby="role-help-en" maxlength="100"><small id="role-help-en" class="role-hint">多个职位请用空格分隔，如 职位一　职位二。</small></div>
+<label class="contact"><span>电话</span><input name="phone" type="tel" placeholder="请输入联系电话" maxlength="36" autocomplete="tel" required></label>
+<label class="contact"><span>邮箱</span><input name="email" type="email" placeholder="请输入工作邮箱" maxlength="110" autocomplete="email" required></label>
+</div>
+<details class="optional-fields" open>
+<summary>其他信息 <span>选填</span></summary>
+<div class="fields bilingual-fields">
+<label class="contact"><span>中文</span><textarea name="affiliation" rows="2" maxlength="240" placeholder="请输入其他信息，可换行">可信数据空间发展联盟 新材料特设组组长</textarea></label>
+<label class="contact"><span>英文</span><textarea name="affiliationEn" rows="2" maxlength="420" placeholder="Enter other information on separate lines" lang="en">Chair of the New Materials Task Force, Trusted Data Space Development Alliance</textarea></label>
+</div>
+</details>
+<div class="form-foot"><p id="form-status" class="note" role="status">电话和邮箱两版共用。按需填写对应语言的姓名和职位。</p><button class="primary" type="submit">确定信息</button></div>
+</form>
+</section>
+<section class="panel" aria-labelledby="preview-title">
+<div class="panel-head"><div class="heading"><span class="step">02</span><h2 id="preview-title">名片预览</h2></div><span id="preview-state" class="pill live">中英双语</span></div>
+<div class="stage paired-stage">
+<figure><figcaption><strong>中文名片</strong><span id="zh-state">示例</span></figcaption><canvas id="card-zh" width="1680" height="960" aria-label="中文名片预览"></canvas></figure>
+<figure><figcaption><strong>英文名片</strong><span id="en-state">示例</span></figcaption><canvas id="card-en" width="1680" height="960" aria-label="英文名片预览"></canvas></figure>
+<p class="caption"><span id="mode-label">商务版</span><span>1680 × 960 px / 张</span></p>
+</div>
+<div class="export-bar">
+<div class="download-options"><label for="download-language">下载语言</label><select id="download-language"><option value="zh">中文</option><option value="en">英文</option><option value="both">中英都要</option></select></div>
+<p class="note" id="export-note">PNG 图片保留透明圆角。</p>
+<button class="primary" id="download" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m-4-4 4 4 4-4M5 16v4h14v-4"/></svg><span id="download-label">下载 PNG</span></button>
+</div>
+</section>
+<footer class="footer employee-footer">
+<div class="footer-meta"><span>新材道电子名片 · CARD STUDIO</span><span>模板样式由设计师统一配置</span></div>
+<p class="usage-notice"><strong>使用声明</strong> 本工具仅限北京新材道数智科技有限公司在职正式员工及公司领导用于公务名片制作。请如实填写姓名、职位等信息，未经公司授权，不得冒用公司名义制作或传播名片。本工具的使用规则由北京新材道数智科技有限公司依法制定、管理和说明。</p>
+</footer>
+</main>
+<script>/*__CARD__*/</script>
+<script>/*__PAGE__*/</script>
+</body>
+</html>
