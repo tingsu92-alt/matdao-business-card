@@ -108,6 +108,8 @@ details .designer-fields{margin:12px 0}
 
 /* 员工独立站不显示设计师入口，无需预留悬浮按钮空间。 */
 .employee-page main{padding-right:32px}@media(max-width:720px){.employee-page main{padding-right:18px}}
+
+.phone-save{width:min(760px,calc(100% - 24px));max-height:calc(100dvh - 24px);padding:20px;border:1px solid var(--line);border-radius:18px;background:#fff;color:var(--ink);overflow:auto;overscroll-behavior:contain}.phone-save::backdrop{background:#15151599}.phone-save-head{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:12px}.phone-save-images{display:grid;gap:24px;margin:18px 0}.phone-save-images figure{margin:0}.phone-save-images figcaption{font-size:12px;color:var(--muted);margin-bottom:8px}.phone-save-images img{display:block;width:100%;height:auto;object-fit:contain;border-radius:12px;background:repeating-conic-gradient(#f1f1f1 0% 25%,#fff 0% 50%) 0/16px 16px;-webkit-touch-callout:default;user-select:auto;-webkit-user-select:auto}.phone-save-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.phone-save-help{margin-bottom:12px}.phone-save #phone-save-status{margin-top:10px}@media(max-width:720px){.export-bar{flex-wrap:wrap}.export-bar #export-note{order:3;flex-basis:100%}.phone-save{padding:16px}.phone-save-actions{flex-direction:column;align-items:stretch}.phone-save-head{position:sticky;top:-16px;background:#fff;padding:8px 0;z-index:1}}
 </style>
 </head>
 <body class="employee-page">
@@ -148,6 +150,7 @@ details .designer-fields{margin:12px 0}
 <div class="export-bar">
 <div class="download-options"><label for="download-language">下载语言</label><select id="download-language"><option value="zh">中文</option><option value="en">英文</option><option value="both">中英都要</option></select></div>
 <p class="note" id="export-note">PNG 图片保留透明圆角。</p>
+<button class="secondary" id="save-phone" type="button">保存到手机</button>
 <button class="primary" id="download" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m-4-4 4 4 4-4M5 16v4h14v-4"/></svg><span id="download-label">下载 PNG</span></button>
 </div>
 </section>
@@ -156,6 +159,14 @@ details .designer-fields{margin:12px 0}
 <p class="usage-notice"><strong>使用声明</strong> 本工具仅限北京新材道数智科技有限公司在职正式员工及公司领导用于公务名片制作。请如实填写姓名、职位等信息，未经公司授权，不得冒用公司名义制作或传播名片。本工具的使用规则由北京新材道数智科技有限公司依法制定、管理和说明。</p>
 </footer>
 </main>
+<dialog class="phone-save" id="phone-save" aria-labelledby="phone-save-title">
+<div class="phone-save-head"><h2 id="phone-save-title">保存名片图片</h2><button class="secondary" id="phone-save-close" type="button" autofocus>关闭</button></div>
+<p class="note">点击图片下方的「分享图片」，在系统菜单中查找「存储图像」或「保存图片」。需要你手动选择，网页不会自动写入相册。</p>
+<div id="phone-save-images" class="phone-save-images"></div>
+<p class="note phone-save-help">如果微信没有保存选项，请将网页链接复制到 Safari 打开，重新生成后点「分享图片」。也可尝试长按下方图片；是否出现保存菜单取决于浏览器。</p>
+<button class="secondary" id="copy-page-link" type="button">复制网页链接</button>
+<p class="note" id="phone-save-status" role="status"></p>
+</dialog>
 <script>const WIDTH = 1680, HEIGHT = 960;
 const MODES = { business: '商务版', regular: '常规版' };
 const SAMPLE = {name:'姓名', role:'职位', phone:'138 0000 0000', email:'name@example.com', affiliation:'可信数据空间发展联盟 新材料特设组组长'};
@@ -528,17 +539,91 @@ async function makePng(version,language,data){
   return blob;
 }
 function safeName(name){return name.replace(/[\\/:*?"<>|]/g,'_');}
+async function pngFiles(version,languages){
+  return Promise.all(languages.map(async language=>{
+    const data=values(language);
+    const filename=safeName(data.name)+'-新材道电子名片-'+MODES[version]+'-'+LANGUAGES[language]+'.png';
+    return {language,filename,blob:await makePng(version,language,data)};
+  }));
+}
+function imageDataUrl(blob){
+  return new Promise((resolve,reject)=>{
+    const reader=new FileReader();
+    reader.onload=()=>resolve(reader.result);
+    reader.onerror=reject;
+    reader.readAsDataURL(blob);
+  });
+}
+const phoneDialog=$('phone-save');
+$('phone-save-close').addEventListener('click',()=>phoneDialog.close());
+$('save-phone').addEventListener('click',async()=>{
+  const languages=selected(),version=mode;
+  if(!check(languages)) return;
+  const button=$('save-phone');
+  button.disabled=true;
+  try{
+    const files=await pngFiles(version,languages);
+    const images=await Promise.all(files.map(file=>imageDataUrl(file.blob)));
+    $('phone-save-images').replaceChildren();
+    $('phone-save-status').textContent='';
+    files.forEach((file,index)=>{
+      const figure=document.createElement('figure');
+      const caption=document.createElement('figcaption');
+      caption.textContent=LANGUAGES[file.language]+' · PNG · '+WIDTH+' × '+HEIGHT+' px';
+      const image=document.createElement('img');
+      image.src=images[index];
+      image.alt=LANGUAGES[file.language]+'名片保存图片';
+      image.width=WIDTH;image.height=HEIGHT;
+      const actions=document.createElement('div');
+      actions.className='phone-save-actions';
+      const png=new File([file.blob],file.filename,{type:'image/png'});
+      let canShare=false;
+      try{canShare=Boolean(navigator.share&&navigator.canShare&&navigator.canShare({files:[png]}));}catch{}
+      if(canShare){
+        const share=document.createElement('button');
+        share.type='button';share.className='primary';share.textContent='分享'+LANGUAGES[file.language]+'图片';
+        share.addEventListener('click',async()=>{
+          share.disabled=true;
+          try{
+            await navigator.share({files:[png]});
+            $('phone-save-status').textContent='分享菜单已关闭，请到相册确认是否已保存。';
+          }catch(error){
+            $('phone-save-status').textContent=error.name==='AbortError'?'已取消分享，可重新点击。':'当前浏览器未能打开系统分享，请在 Safari 中打开此网页后重试。';
+          }finally{share.disabled=false;}
+        });
+        actions.append(share);
+      }else{
+        const hint=document.createElement('p');hint.className='note';
+        hint.textContent='当前浏览器不支持图片系统分享。iPhone 请在 Safari 中打开此网页后重试。';
+        figure.append(hint);
+      }
+      const download=document.createElement('button');
+      download.type='button';download.className='secondary';download.textContent='下载'+LANGUAGES[file.language]+' PNG 文件';
+      download.addEventListener('click',()=>downloadFile(file.blob,file.filename));
+      actions.append(download);
+      figure.prepend(caption,image);figure.append(actions);
+      $('phone-save-images').append(figure);
+    });
+    phoneDialog.showModal();
+  }catch{
+    status('图片生成失败，请重试。','status-error');
+  }finally{button.disabled=false;}
+});
+$('copy-page-link').addEventListener('click',async()=>{
+  try{
+    await navigator.clipboard.writeText(location.href);
+    $('phone-save-status').textContent='链接已复制，请打开 Safari，在地址栏粘贴。';
+  }catch{
+    $('phone-save-status').textContent='未能自动复制，请从浏览器地址栏或右上角菜单复制网页链接。';
+  }
+});
 $('download').addEventListener('click',async ()=>{
   const languages=selected(),version=mode;
   if(!check(languages)) return;
   const button=$('download');
   button.disabled=true;
   try{
-    const files=await Promise.all(languages.map(async language=>{
-      const data=values(language);
-      const filename=safeName(data.name)+'-新材道电子名片-'+MODES[version]+'-'+LANGUAGES[language]+'.png';
-      return {filename,blob:await makePng(version,language,data)};
-    }));
+    const files=await pngFiles(version,languages);
     if(files.length===1) downloadFile(files[0].blob,files[0].filename);
     else downloadFile(await zipPngs(files),'新材道电子名片-'+MODES[version]+'-中英双版.zip');
   }catch{
