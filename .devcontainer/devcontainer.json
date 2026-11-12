@@ -1,9 +1,14 @@
 {
   "name": "新材道设计师配置",
   "image": "mcr.microsoft.com/devcontainers/javascript-node:1-22-bookworm",
-  "forwardPorts": [8765],
+  "forwardPorts": [
+    8765
+  ],
   "portsAttributes": {
-    "8765": {"label": "设计师配置（仅本人）", "onAutoForward": "notify", "protocol": "https"}
+    "8765": {
+      "label": "设计师配置（仅本人）",
+      "onAutoForward": "notify"
+    }
   },
   "postStartCommand": "bash .devcontainer/start-designer.sh"
 }
