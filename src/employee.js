@@ -4,7 +4,6 @@ const render = Object.fromEntries(Object.keys(LANGUAGES).map(language=>[language
 const sample = {zh:SAMPLE,en:EN_SAMPLE};
 const names = {zh:['name','role'],en:['nameEn','roleEn']};
 const affiliations = {zh:'affiliation',en:'affiliationEn'};
-const choice = $('download-language');
 const idle = '';
 let mode='regular';
 const editedEnglish=new Set();
@@ -15,18 +14,21 @@ function values(language){
   const [name,role]=names[language];
   return {name:value(name),role:value(role),affiliation:value(affiliations[language]),phone:value('phone'),email:value('email')};
 }
-function selected(){return choice.value==='both'?['zh','en']:[choice.value];}
+function hasEnglish(){return Boolean(value('nameEn')||value('roleEn')||(editedEnglish.has('affiliationEn')&&value('affiliationEn')));}
+function selected(){return hasEnglish()?['zh','en']:['zh'];}
 function status(message,style=''){
   $('form-status').textContent=message;
   $('form-status').hidden=!message;
   $('form-status').className='note '+style;
 }
 function preview(){
-  const hasEnglish=Boolean(value('nameEn')||value('roleEn')||(editedEnglish.has('affiliationEn')&&value('affiliationEn')));
-  $('en-preview').hidden=!hasEnglish;
-  $('preview-stage').classList.toggle('zh-only',!hasEnglish);
+  const bilingual=hasEnglish();
+  $('download-label').textContent=bilingual?'下载中英双版 ZIP':'下载中文 PNG';
+  $('export-note').textContent=bilingual?'2 张 PNG · 1680 × 960 px/张 · ZIP':'PNG · 1680 × 960 px · 透明圆角';
+  $('en-preview').hidden=!bilingual;
+  $('preview-stage').classList.toggle('zh-only',!bilingual);
   for(const language of Object.keys(LANGUAGES)){
-    if(language==='en'&&!hasEnglish) continue;
+    if(language==='en'&&!bilingual) continue;
     const data=values(language);
     const demo=!data.name&&!data.role;
     void render[language](mode,templates[mode],demo?{...sample[language],affiliation:data.affiliation,phone:data.phone||sample[language].phone,email:data.email||sample[language].email}:data,language);
@@ -56,14 +58,6 @@ form.addEventListener('input',event=>{
 });
 form.addEventListener('submit',event=>event.preventDefault());
 bindSwitch(next=>{mode=next;preview();});
-choice.addEventListener('change',()=>{
-  const both=choice.value==='both';
-  if(choice.value==='en'||both) $('english-fields').open=true;
-  $('download-label').textContent=both?'下载 ZIP':'下载 PNG';
-  $('export-note').textContent=both?'2 张 PNG · 1680 × 960 px/张 · ZIP':'PNG · 1680 × 960 px · 透明圆角';
-  status(idle);
-});
-
 async function makePng(version,language,data){
   const canvas=document.createElement('canvas');
   canvas.width=WIDTH;
