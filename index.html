@@ -241,9 +241,46 @@ function fitImage(ctx,img,x,y,w,h,cover=false) {
   const width=img.width*factor, height=img.height*factor;
   ctx.drawImage(img,x+(cover||h===w?(w-width)/2:0),y+(h-height)/2,width,height);
 }
+let paperTexture;
+function getPaperTexture(){
+  if(paperTexture) return paperTexture;
+  const canvas=document.createElement('canvas');
+  canvas.width=WIDTH;canvas.height=HEIGHT;
+  const ctx=canvas.getContext('2d');
+  const pixels=ctx.createImageData(WIDTH,HEIGHT);
+  let seed=261126;
+  const random=()=>{seed^=seed<<13;seed^=seed>>>17;seed^=seed<<5;return (seed>>>0)/4294967296;};
+  const step=8,columns=Math.ceil(WIDTH/step)+1,rows=Math.ceil(HEIGHT/step)+1;
+  const grain=Float32Array.from({length:columns*rows},()=>random()*2-1);
+  for(let y=0;y<HEIGHT;y++){
+    const gy=Math.floor(y/step),fy=(y%step)/step;
+    for(let x=0;x<WIDTH;x++){
+      const gx=Math.floor(x/step),fx=(x%step)/step,i=gy*columns+gx;
+      const surface=(grain[i]*(1-fx)+grain[i+1]*fx)*(1-fy)+(grain[i+columns]*(1-fx)+grain[i+columns+1]*fx)*fy;
+      const shade=Math.max(239,Math.min(255,Math.round(250+surface*5+(random()-.5)*7)));
+      const offset=(y*WIDTH+x)*4;
+      pixels.data[offset]=pixels.data[offset+1]=pixels.data[offset+2]=shade;
+      pixels.data[offset+3]=255;
+    }
+  }
+  ctx.putImageData(pixels,0,0);
+  // Short paired fibers add a subtle relief; no repeating tile or baked-in text.
+  ctx.lineWidth=.7;ctx.lineCap='round';
+  for(let i=0;i<16000;i++){
+    const x=random()*WIDTH,y=random()*HEIGHT,length=2+random()*7,angle=random()*Math.PI;
+    const dx=Math.cos(angle)*length,dy=Math.sin(angle)*length*.45;
+    ctx.strokeStyle='rgba(80,80,80,.055)';
+    ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+dx,y+dy);ctx.stroke();
+    ctx.strokeStyle='rgba(255,255,255,.7)';
+    ctx.beginPath();ctx.moveTo(x,y-.8);ctx.lineTo(x+dx,y+dy-.8);ctx.stroke();
+  }
+  paperTexture=canvas;
+  return canvas;
+}
 function demoBackground(ctx, mode) {
   ctx.fillStyle=mode==='business'?'#171513':mode==='brandRed'?'#e5222a':'#ffffff';
   ctx.fillRect(0,0,WIDTH,HEIGHT);
+  if(mode==='regular') ctx.drawImage(getPaperTexture(),0,0);
 }
 function setFont(ctx,weight,size){
   ctx.font=weight+' '+size+'px "PingFang SC", "Microsoft YaHei", system-ui, sans-serif';
