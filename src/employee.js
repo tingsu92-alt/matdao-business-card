@@ -2,7 +2,8 @@ const templates = withTemplateDefaults(TEMPLATES ?? DEFAULTS);
 const form = $('card-form');
 const previewSequence={zh:0,en:0};
 const FRAME_WIDTH=1800,FRAME_HEIGHT=1120;
-const PRESENTATION={regular:{color:'#e7e9ec',label:'浅灰衬底'},brandRed:{color:'#232326',label:'炭黑衬底'},business:{color:'#000000',label:'纯黑衬底'}};
+const PRESENTATION={regular:{color:'#e7e9ec',label:'浅灰衬底'},brandRed:{color:'#232326',label:'炭黑衬底'},business:{color:'#85898d',label:'金属质感衬底'}};
+const METAL_BACKGROUND=/*__METAL_BACKGROUND__*/ '';
 let exportFormat='png';
 const sample = {zh:SAMPLE,en:EN_SAMPLE};
 const names = {zh:['name','role'],en:['nameEn','roleEn']};
@@ -79,6 +80,10 @@ async function imageCanvas(version,language,data,format){
   const ctx=frame.getContext('2d');
   ctx.fillStyle=PRESENTATION[version].color;
   ctx.fillRect(0,0,frame.width,frame.height);
+  if(version==='business'){
+    const metal=await getImage(METAL_BACKGROUND);
+    if(metal) fitImage(ctx,metal,0,0,frame.width,frame.height,true);
+  }
   const width=FRAME_WIDTH*.84,height=width*card.height/card.width;
   const x=(FRAME_WIDTH-width)/2,y=(frame.height-height)/2;
   ctx.save();
