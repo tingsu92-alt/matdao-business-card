@@ -109,3 +109,8 @@ details .designer-fields{margin:12px 0}
 .language-fields{grid-template-columns:repeat(2,minmax(0,1fr))}.language-fields .contact{grid-column:1/-1}@media(max-width:440px){.language-fields{grid-template-columns:1fr}}
 
 .preview-head{flex-wrap:wrap}.preview-head .switch{flex-shrink:0}.preview-head .switch button{min-height:40px}@media(max-width:440px){.preview-head{align-items:flex-start}.preview-head .switch{width:100%;display:flex}.preview-head .switch button{flex:1}}
+
+.employee-page #english-fields summary{font-size:15px;color:var(--ink)}
+.employee-page #english-fields summary span{color:var(--ink)}
+.paired-stage.zh-only{grid-template-columns:minmax(0,1fr)}
+.paired-stage.zh-only figure{width:min(100%,720px);justify-self:center}

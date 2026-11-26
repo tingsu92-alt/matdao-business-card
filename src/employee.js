@@ -5,8 +5,9 @@ const sample = {zh:SAMPLE,en:EN_SAMPLE};
 const names = {zh:['name','role'],en:['nameEn','roleEn']};
 const affiliations = {zh:'affiliation',en:'affiliationEn'};
 const choice = $('download-language');
-const idle = '默认只需填写中文信息。需要英文名片时，展开「英文信息」填写；电话和邮箱两版共用。';
+const idle = '';
 let mode='regular';
+const editedEnglish=new Set();
 
 function field(key){return form.elements.namedItem(key);}
 function value(key){return field(key).value.trim();}
@@ -17,11 +18,16 @@ function values(language){
 function selected(){return choice.value==='both'?['zh','en']:[choice.value];}
 function status(message,style=''){
   $('form-status').textContent=message;
+  $('form-status').hidden=!message;
   $('form-status').className='note '+style;
 }
 function preview(){
   $('mode-label').textContent=MODES[mode];
+  const hasEnglish=Boolean(value('nameEn')||value('roleEn')||(editedEnglish.has('affiliationEn')&&value('affiliationEn')));
+  $('en-preview').hidden=!hasEnglish;
+  $('preview-stage').classList.toggle('zh-only',!hasEnglish);
   for(const language of Object.keys(LANGUAGES)){
+    if(language==='en'&&!hasEnglish) continue;
     const data=values(language);
     const demo=!data.name&&!data.role;
     $(language+'-state').textContent=demo?'示例':'实时';
@@ -46,14 +52,11 @@ function check(languages){
 }
 form.addEventListener('input',event=>{
   event.target.setCustomValidity('');
+  if(['nameEn','roleEn','affiliationEn'].includes(event.target.name)) editedEnglish.add(event.target.name);
   status(idle);
   preview();
 });
-form.addEventListener('submit',event=>{
-  event.preventDefault();
-  if(!check(selected())) return;
-  status('所选语言的信息已确认，可以下载名片。','status-ok');
-});
+form.addEventListener('submit',event=>event.preventDefault());
 bindSwitch(next=>{mode=next;preview();});
 choice.addEventListener('change',()=>{
   const both=choice.value==='both';

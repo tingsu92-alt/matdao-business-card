@@ -116,13 +116,18 @@ details .designer-fields{margin:12px 0}
 .language-fields{grid-template-columns:repeat(2,minmax(0,1fr))}.language-fields .contact{grid-column:1/-1}@media(max-width:440px){.language-fields{grid-template-columns:1fr}}
 
 .preview-head{flex-wrap:wrap}.preview-head .switch{flex-shrink:0}.preview-head .switch button{min-height:40px}@media(max-width:440px){.preview-head{align-items:flex-start}.preview-head .switch{width:100%;display:flex}.preview-head .switch button{flex:1}}
+
+.employee-page #english-fields summary{font-size:15px;color:var(--ink)}
+.employee-page #english-fields summary span{color:var(--ink)}
+.paired-stage.zh-only{grid-template-columns:minmax(0,1fr)}
+.paired-stage.zh-only figure{width:min(100%,720px);justify-self:center}
 </style>
 </head>
 <body class="employee-page">
 
 <main>
 <section class="hero" aria-labelledby="title">
-<div><div class="kicker">CARD STUDIO</div><h1 id="title">新材道电子名片</h1><p>填写个人信息，预览并下载你的电子名片。</p></div>
+<div><h1 id="title">新材道电子名片</h1><p>填写个人信息，预览并下载你的电子名片。</p></div>
 
 </section>
 <section class="panel" aria-labelledby="info-title">
@@ -148,14 +153,14 @@ details .designer-fields{margin:12px 0}
 <label class="contact"><span>其他信息（英文）</span><textarea name="affiliationEn" rows="2" maxlength="420" placeholder="Enter other information on separate lines" lang="en">Chair of the New Materials Task Force, Trusted Data Space Development Alliance</textarea></label>
 </div>
 </details>
-<div class="form-foot"><p id="form-status" class="note" role="status">默认只需填写中文信息。需要英文名片时，展开「英文信息」填写；电话和邮箱两版共用。</p><button class="primary" type="submit">确定信息</button></div>
+<p id="form-status" class="note" role="status" hidden></p>
 </form>
 </section>
 <section class="panel" aria-labelledby="preview-title">
 <div class="panel-head preview-head"><div class="heading"><span class="step">02</span><h2 id="preview-title">名片预览</h2></div><div class="switch" role="group" aria-label="名片版本"><button data-mode="regular" aria-pressed="true">常规版</button><button data-mode="business" aria-pressed="false">商务版</button><button data-mode="brandRed" aria-pressed="false">品牌红</button></div></div>
-<div class="stage paired-stage">
+<div class="stage paired-stage zh-only" id="preview-stage">
 <figure><figcaption><strong>中文名片</strong><span id="zh-state">示例</span></figcaption><canvas id="card-zh" width="1680" height="960" aria-label="中文名片预览"></canvas></figure>
-<figure><figcaption><strong>英文名片</strong><span id="en-state">示例</span></figcaption><canvas id="card-en" width="1680" height="960" aria-label="英文名片预览"></canvas></figure>
+<figure id="en-preview" hidden><figcaption><strong>英文名片</strong><span id="en-state">示例</span></figcaption><canvas id="card-en" width="1680" height="960" aria-label="英文名片预览"></canvas></figure>
 <p class="caption"><span id="mode-label">常规版</span><span>1680 × 960 px / 张</span></p>
 </div>
 <div class="export-bar">
@@ -496,8 +501,9 @@ const sample = {zh:SAMPLE,en:EN_SAMPLE};
 const names = {zh:['name','role'],en:['nameEn','roleEn']};
 const affiliations = {zh:'affiliation',en:'affiliationEn'};
 const choice = $('download-language');
-const idle = '默认只需填写中文信息。需要英文名片时，展开「英文信息」填写；电话和邮箱两版共用。';
+const idle = '';
 let mode='regular';
+const editedEnglish=new Set();
 
 function field(key){return form.elements.namedItem(key);}
 function value(key){return field(key).value.trim();}
@@ -508,11 +514,16 @@ function values(language){
 function selected(){return choice.value==='both'?['zh','en']:[choice.value];}
 function status(message,style=''){
   $('form-status').textContent=message;
+  $('form-status').hidden=!message;
   $('form-status').className='note '+style;
 }
 function preview(){
   $('mode-label').textContent=MODES[mode];
+  const hasEnglish=Boolean(value('nameEn')||value('roleEn')||(editedEnglish.has('affiliationEn')&&value('affiliationEn')));
+  $('en-preview').hidden=!hasEnglish;
+  $('preview-stage').classList.toggle('zh-only',!hasEnglish);
   for(const language of Object.keys(LANGUAGES)){
+    if(language==='en'&&!hasEnglish) continue;
     const data=values(language);
     const demo=!data.name&&!data.role;
     $(language+'-state').textContent=demo?'示例':'实时';
@@ -537,14 +548,11 @@ function check(languages){
 }
 form.addEventListener('input',event=>{
   event.target.setCustomValidity('');
+  if(['nameEn','roleEn','affiliationEn'].includes(event.target.name)) editedEnglish.add(event.target.name);
   status(idle);
   preview();
 });
-form.addEventListener('submit',event=>{
-  event.preventDefault();
-  if(!check(selected())) return;
-  status('所选语言的信息已确认，可以下载名片。','status-ok');
-});
+form.addEventListener('submit',event=>event.preventDefault());
 bindSwitch(next=>{mode=next;preview();});
 choice.addEventListener('change',()=>{
   const both=choice.value==='both';
