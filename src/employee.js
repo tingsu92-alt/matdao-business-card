@@ -1,8 +1,8 @@
 const templates = withTemplateDefaults(TEMPLATES ?? DEFAULTS);
 const form = $('card-form');
 const previewSequence={zh:0,en:0};
-const SQUARE_SIZE=1800;
-const PRESENTATION={regular:{color:'#e7e9ec',label:'浅灰衬底'},brandRed:{color:'#232326',label:'炭黑衬底'},business:{color:'#7a2937',label:'酒红衬底'}};
+const FRAME_WIDTH=1800,FRAME_HEIGHT=1120;
+const PRESENTATION={regular:{color:'#e7e9ec',label:'浅灰衬底'},brandRed:{color:'#232326',label:'炭黑衬底'},business:{color:'#e6e2dc',label:'浅暖灰衬底'}};
 let exportFormat='png';
 const sample = {zh:SAMPLE,en:EN_SAMPLE};
 const names = {zh:['name','role'],en:['nameEn','roleEn']};
@@ -28,8 +28,8 @@ function preview(){
   const bilingual=hasEnglish();
   const label=exportFormat==='jpg'?'JPG':'PNG';
   $('download-label').textContent=bilingual?'下载中英双版 '+label+' ZIP':'下载中文 '+label;
-  $('export-note').textContent=(bilingual?'2 张 · ':'')+(exportFormat==='jpg'?'JPG · 1800 × 1800 px · '+PRESENTATION[mode].label:'PNG · 1680 × 960 px · 透明圆角');
-  $('preview-stage').classList.toggle('square-preview',exportFormat==='jpg');
+  $('export-note').textContent=(bilingual?'2 张 · ':'')+(exportFormat==='jpg'?'JPG · 1800 × 1120 px · '+PRESENTATION[mode].label:'PNG · 1680 × 960 px · 透明圆角');
+  $('preview-stage').classList.toggle('framed-preview',exportFormat==='jpg');
   $('en-preview').hidden=!bilingual;
   $('preview-stage').classList.toggle('zh-only',!bilingual);
   for(const language of Object.keys(LANGUAGES)){
@@ -73,20 +73,20 @@ async function imageCanvas(version,language,data,format){
   card.width=WIDTH;card.height=HEIGHT;
   await renderCard(card.getContext('2d'),version,templates[version],data,language);
   if(format==='png') return card;
-  const square=document.createElement('canvas');
-  square.width=square.height=SQUARE_SIZE;
-  const ctx=square.getContext('2d');
+  const frame=document.createElement('canvas');
+  frame.width=FRAME_WIDTH;frame.height=FRAME_HEIGHT;
+  const ctx=frame.getContext('2d');
   ctx.fillStyle=PRESENTATION[version].color;
-  ctx.fillRect(0,0,SQUARE_SIZE,SQUARE_SIZE);
-  const width=SQUARE_SIZE*.84,height=width*HEIGHT/WIDTH;
-  const x=(SQUARE_SIZE-width)/2,y=(SQUARE_SIZE-height)/2;
+  ctx.fillRect(0,0,FRAME_WIDTH,FRAME_HEIGHT);
+  const width=FRAME_WIDTH*.84,height=width*HEIGHT/WIDTH;
+  const x=(FRAME_WIDTH-width)/2,y=(FRAME_HEIGHT-height)/2;
   ctx.save();
   ctx.imageSmoothingQuality='high';
   ctx.shadowColor=version==='regular'?'rgba(20,24,30,.22)':'rgba(0,0,0,.38)';
   ctx.shadowBlur=54;ctx.shadowOffsetY=28;
   ctx.drawImage(card,x,y,width,height);
   ctx.restore();
-  return square;
+  return frame;
 }
 async function renderPreview(language,version,format,data){
   const revision=++previewSequence[language];
