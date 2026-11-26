@@ -205,7 +205,7 @@ async function renderCard(ctx, mode, template, data, language='zh') {
   writeLine(ctx,slogan,l.slogan,template.muted,'400');
   const [qrX,qrY,qrWidth,qrHeight]=box(l.qr);
   const qrSize=Math.min(qrWidth,qrHeight);
-  ctx.fillStyle=mode==='business'?'#171513':'#fff';
+  ctx.fillStyle='#ffffff';
   round(ctx,qrX,qrY,qrSize,qrSize,12);
   ctx.fill();
   ctx.strokeStyle=template.accent;
@@ -213,7 +213,7 @@ async function renderCard(ctx, mode, template, data, language='zh') {
   ctx.stroke();
   // This fixed QR has 29 modules. Reserve a four-module quiet zone per side.
   const inset=template.qr===DEFAULT_QR?qrSize*4/37:Math.max(10,qrSize*.07);
-  ctx.fillStyle=mode==='business'?'#fffaf0':'#ffffff';
+  ctx.fillStyle='#ffffff';
   ctx.fillRect(qrX+inset,qrY+inset,qrSize-2*inset,qrSize-2*inset);
   if(qr){
     ctx.imageSmoothingEnabled=false;
