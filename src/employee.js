@@ -166,7 +166,23 @@ function imageDataUrl(blob){
     reader.readAsDataURL(blob);
   });
 }
+function phoneSaveExperience(userAgent=navigator.userAgent,platform=navigator.platform,maxTouchPoints=navigator.maxTouchPoints){
+  const apple=/iPhone|iPad|iPod/i.test(userAgent)||(platform==='MacIntel'&&maxTouchPoints>1);
+  const android=/Android/i.test(userAgent);
+  const wechat=/MicroMessenger/i.test(userAgent);
+  const browser=apple?'Safari':'手机系统浏览器或 Chrome';
+  const intro=apple
+    ?'点击图片下方的「分享并保存」，在系统菜单中选择「存储图像」或「保存图片」。需要你手动选择，网页不会自动写入相册。'
+    :'点击图片下方的「下载图片」。若相册中未显示，请到浏览器的「下载内容」或文件管理的「下载」目录查找。';
+  const help=wechat
+    ?(apple?'微信内若没有保存选项，请复制网页链接到 Safari 打开，重新生成后分享保存。':'微信内可尝试长按图片，选择「保存图片」。若没有此选项，请通过右上角菜单在浏览器中打开，或复制链接到手机浏览器后下载。')
+    :(apple?'也可尝试长按图片保存；是否出现保存菜单取决于浏览器。':'也可尝试长按图片，选择「下载图片」或「保存图片」。是否自动显示在相册中，取决于手机和浏览器。');
+  return {apple,android,wechat,browser,intro,help};
+}
+const phoneExperience=phoneSaveExperience();
 const phoneDialog=$('phone-save');
+$('phone-save-intro').textContent=phoneExperience.intro;
+$('phone-save-help').textContent=phoneExperience.help;
 $('phone-save-close').addEventListener('click',()=>phoneDialog.close());
 $('save-phone').addEventListener('click',async()=>{
   const languages=selected(),version=mode,format=exportFormat;
@@ -179,6 +195,7 @@ $('save-phone').addEventListener('click',async()=>{
     const images=await Promise.all(files.map(file=>imageDataUrl(file.blob)));
     $('phone-save-images').replaceChildren();
     $('phone-save-status').textContent='';
+    let anyShare=false;
     files.forEach((file,index)=>{
       const figure=document.createElement('figure');
       const caption=document.createElement('figcaption');
@@ -192,31 +209,37 @@ $('save-phone').addEventListener('click',async()=>{
       const shareFile=new File([file.blob],file.filename,{type:file.type});
       let canShare=false;
       try{canShare=Boolean(navigator.share&&navigator.canShare&&navigator.canShare({files:[shareFile]}));}catch{}
+      let share;
       if(canShare){
-        const share=document.createElement('button');
-        share.type='button';share.className='primary';share.textContent='分享'+LANGUAGES[file.language]+'图片';
+        anyShare=true;
+        share=document.createElement('button');
+        share.type='button';share.className=phoneExperience.apple?'primary':'secondary';
+        share.textContent=phoneExperience.apple?'分享并保存（'+LANGUAGES[file.language]+'）':'分享'+LANGUAGES[file.language]+'图片';
         share.addEventListener('click',async()=>{
           share.disabled=true;
           try{
             await navigator.share({files:[shareFile]});
-            $('phone-save-status').textContent='分享菜单已关闭，请到相册确认是否已保存。';
+            $('phone-save-status').textContent=phoneExperience.apple?'分享菜单已关闭；若已选择存储图像，请到相册确认。':'分享菜单已关闭。分享不等于下载，如需保存到手机，请点击「下载图片」。';
           }catch(error){
-            $('phone-save-status').textContent=error.name==='AbortError'?'已取消分享，可重新点击。':'当前浏览器未能打开系统分享，请在 Safari 中打开此网页后重试。';
+            $('phone-save-status').textContent=error.name==='AbortError'?'已取消分享，可重新点击。':'当前浏览器未能打开系统分享，可改用下载图片，或在'+phoneExperience.browser+'中打开此网页后重试。';
           }finally{share.disabled=false;}
         });
-        actions.append(share);
-      }else{
-        const hint=document.createElement('p');hint.className='note';
-        hint.textContent='当前浏览器不支持图片系统分享。iPhone 请在 Safari 中打开此网页后重试。';
-        figure.append(hint);
       }
       const download=document.createElement('button');
-      download.type='button';download.className='secondary';download.textContent='下载'+LANGUAGES[file.language]+' '+file.format+' 文件';
-      download.addEventListener('click',()=>downloadFile(file.blob,file.filename));
-      actions.append(download);
+      download.type='button';download.className=phoneExperience.apple&&canShare?'secondary':'primary';
+      download.textContent=phoneExperience.apple?'下载'+LANGUAGES[file.language]+' '+file.format+' 文件':'下载'+LANGUAGES[file.language]+'图片';
+      download.addEventListener('click',()=>{
+        downloadFile(file.blob,file.filename);
+        $('phone-save-status').textContent='已发起图片下载，请在浏览器的「下载内容」或文件管理中查看。相册中是否显示取决于手机和浏览器。';
+      });
+      if(phoneExperience.apple&&share) actions.append(share,download);
+      else{actions.append(download);if(share) actions.append(share);}
       figure.prepend(caption,image);figure.append(actions);
       $('phone-save-images').append(figure);
     });
+    $('phone-save-intro').textContent=phoneExperience.apple&&!anyShare
+      ?'当前浏览器不支持系统图片分享。可以下载图片文件，或复制链接到 Safari 中打开后重试分享保存。'
+      :phoneExperience.intro;
     phoneDialog.showModal();
   }catch{
     status('图片生成失败，请重试。','status-error');
@@ -225,7 +248,7 @@ $('save-phone').addEventListener('click',async()=>{
 $('copy-page-link').addEventListener('click',async()=>{
   try{
     await navigator.clipboard.writeText(location.href);
-    $('phone-save-status').textContent='链接已复制，请打开 Safari，在地址栏粘贴。';
+    $('phone-save-status').textContent='链接已复制，请打开'+phoneExperience.browser+'，在地址栏粘贴。';
   }catch{
     $('phone-save-status').textContent='未能自动复制，请从浏览器地址栏或右上角菜单复制网页链接。';
   }
