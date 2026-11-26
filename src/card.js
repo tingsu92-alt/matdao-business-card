@@ -1,5 +1,5 @@
 const WIDTH = 1680, HEIGHT = 960;
-const MODES = { regular: '常规版', business: '商务版', brandRed: '品牌红' };
+const MODES = { brandRed: '品牌红', regular: '常规白', business: '商务黑' };
 const SAMPLE = {name:'姓名', role:'职位', phone:'138 0000 0000', email:'name@example.com', affiliation:'可信数据空间发展联盟 新材料特设组组长'};
 const EN_SAMPLE = {name:'Name', role:'Title', phone:SAMPLE.phone, email:SAMPLE.email, affiliation:'Chair of the New Materials Task Force, Trusted Data Space Development Alliance'};
 const LANGUAGES = {zh:'中文', en:'英文'};
@@ -21,7 +21,7 @@ const DEFAULT_LOGO = /*__DEFAULT_LOGO__*/ '';
 const DEFAULT_REGULAR_LOGO = /*__DEFAULT_REGULAR_LOGO__*/ '';
 const DEFAULT_QR = /*__DEFAULT_QR__*/ '';
 const DEFAULTS = {
-  business:{...BRAND,ink:'#f8eddb',muted:'#d2be9d',accent:'#e7be79',radius:68,background:'',logo:DEFAULT_LOGO,qr:DEFAULT_QR,layout:DEFAULT_LAYOUT},
+  business:{...BRAND,ink:'#e7be79',muted:'#e7be79',accent:'#e7be79',radius:68,background:'',logo:DEFAULT_LOGO,qr:DEFAULT_QR,layout:DEFAULT_LAYOUT},
   regular:{...BRAND,ink:'#242424',muted:'#575757',accent:'#404040',radius:68,background:'',logo:DEFAULT_REGULAR_LOGO,qr:DEFAULT_QR,layout:DEFAULT_LAYOUT}
 };
 const TEMPLATES = /*__TEMPLATES__*/ null;
