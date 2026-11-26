@@ -10,6 +10,8 @@ const affiliations = {zh:'affiliation',en:'affiliationEn'};
 const idle = '';
 let mode='regular';
 const editedEnglish=new Set();
+const DRAFT_KEY='matdao-card:employee-draft:v1';
+const DRAFT_FIELDS=['name','role','phone','email','affiliation','nameEn','roleEn','affiliationEn'];
 
 function field(key){return form.elements.namedItem(key);}
 function value(key){return field(key).value.trim();}
@@ -24,6 +26,50 @@ function status(message,style=''){
   $('form-status').hidden=!message;
   $('form-status').className='note '+style;
 }
+function saveDraft(){
+  try{
+    const fields=Object.fromEntries(DRAFT_FIELDS.map(key=>[key,field(key).value]));
+    localStorage.setItem(DRAFT_KEY,JSON.stringify({version:1,fields,englishEdited:[...editedEnglish],englishOpen:$('english-fields').open}));
+    $('draft-status').textContent='已自动保存在当前浏览器';
+    $('clear-draft').disabled=false;
+  }catch{
+    $('draft-status').textContent='当前浏览器未能保存信息，本次填写仍可正常使用';
+  }
+}
+function restoreDraft(){
+  try{
+    const raw=localStorage.getItem(DRAFT_KEY);
+    if(!raw) return;
+    const draft=JSON.parse(raw);
+    if(draft.version!==1||!draft.fields||typeof draft.fields!=='object') throw new Error('无效的保存信息');
+    for(const key of DRAFT_FIELDS){
+      if(typeof draft.fields[key]==='string') field(key).value=draft.fields[key].slice(0,field(key).maxLength);
+    }
+    if(Array.isArray(draft.englishEdited)){
+      for(const key of draft.englishEdited){
+        if(['nameEn','roleEn','affiliationEn'].includes(key)) editedEnglish.add(key);
+      }
+    }
+    $('english-fields').open=draft.englishOpen===true||hasEnglish();
+    $('clear-draft').disabled=false;
+    $('draft-status').textContent='已恢复上次填写的信息（当前浏览器）';
+  }catch{
+    $('draft-status').textContent='未能恢复已保存信息，仍可正常填写';
+  }
+}
+$('clear-draft').addEventListener('click',()=>{
+  try{
+    localStorage.removeItem(DRAFT_KEY);
+    form.reset();
+    for(const key of DRAFT_FIELDS) field(key).setCustomValidity('');
+    editedEnglish.clear();$('english-fields').open=false;
+    $('clear-draft').disabled=true;
+    $('draft-status').textContent='已清除；重新填写后会自动保存';
+    status(idle);preview();
+  }catch{
+    $('draft-status').textContent='未能清除已保存信息，请检查浏览器设置';
+  }
+});
 function preview(){
   const bilingual=hasEnglish();
   const label=exportFormat==='jpg'?'JPG':'PNG';
@@ -59,6 +105,7 @@ function check(languages){
 form.addEventListener('input',event=>{
   event.target.setCustomValidity('');
   if(['nameEn','roleEn','affiliationEn'].includes(event.target.name)) editedEnglish.add(event.target.name);
+  saveDraft();
   status(idle);
   preview();
 });
@@ -124,6 +171,7 @@ $('phone-save-close').addEventListener('click',()=>phoneDialog.close());
 $('save-phone').addEventListener('click',async()=>{
   const languages=selected(),version=mode,format=exportFormat;
   if(!check(languages)) return;
+  saveDraft();
   const button=$('save-phone');
   button.disabled=true;
   try{
@@ -185,6 +233,7 @@ $('copy-page-link').addEventListener('click',async()=>{
 $('download').addEventListener('click',async ()=>{
   const languages=selected(),version=mode,format=exportFormat;
   if(!check(languages)) return;
+  saveDraft();
   const button=$('download');
   button.disabled=true;
   try{
@@ -197,4 +246,5 @@ $('download').addEventListener('click',async ()=>{
     button.disabled=false;
   }
 });
+restoreDraft();
 preview();
