@@ -242,26 +242,8 @@ function fitImage(ctx,img,x,y,w,h,cover=false) {
   ctx.drawImage(img,x+(cover||h===w?(w-width)/2:0),y+(h-height)/2,width,height);
 }
 function demoBackground(ctx, mode) {
-  const dark = mode==='business', red=mode==='brandRed';
-  const grad = ctx.createLinearGradient(0,HEIGHT,WIDTH,0);
-  grad.addColorStop(0,dark?'#080808':red?'#ad0923':'#ffffff');
-  grad.addColorStop(.57,dark?'#17130f':red?'#d30d2b':'#fffdfd');
-  grad.addColorStop(1,dark?'#302419':red?'#ed2441':'#fff2f4');
-  ctx.fillStyle=grad;
+  ctx.fillStyle=mode==='business'?'#171513':mode==='brandRed'?'#ff112d':'#ffffff';
   ctx.fillRect(0,0,WIDTH,HEIGHT);
-  const glow=ctx.createRadialGradient(1500,120,0,1500,120,850);
-  glow.addColorStop(0,dark?'#aa753e55':'#00000000');
-  glow.addColorStop(1,dark?'#aa753e00':'#00000000');
-  ctx.fillStyle=glow;
-  ctx.fillRect(0,0,WIDTH,HEIGHT);
-  ctx.lineWidth=2;
-  ctx.strokeStyle=dark?'#d8ad6733':red?'#ffffff24':'#ff112d10';
-  for(let i=0;i<17;i++){
-    ctx.beginPath();
-    ctx.moveTo(700+i*31,990);
-    ctx.bezierCurveTo(1490+i*17,780,560+i*40,185,1460+i*26,-35);
-    ctx.stroke();
-  }
 }
 function setFont(ctx,weight,size){
   ctx.font=weight+' '+size+'px "PingFang SC", "Microsoft YaHei", system-ui, sans-serif';
@@ -373,7 +355,7 @@ async function renderCard(ctx, mode, template, data, language='zh') {
     ctx.fillStyle=template.accent;
     round(ctx,x,y+h*.1,s,s,s*.22);
     ctx.fill();
-    ctx.strokeStyle=mode==='business'?'#17130f':'#fff';
+    ctx.strokeStyle=mode==='business'?'#171513':'#fff';
     ctx.lineWidth=s*.075;
     ctx.beginPath();
     ctx.moveTo(x+s*.22,y+h*.1+s*.63);
@@ -393,7 +375,7 @@ async function renderCard(ctx, mode, template, data, language='zh') {
   writeLine(ctx,slogan,l.slogan,template.muted,'450');
   const [qrX,qrY,qrWidth,qrHeight]=box(l.qr);
   const qrSize=Math.min(qrWidth,qrHeight);
-  ctx.fillStyle=mode==='business'?'#17130f':'#fff';
+  ctx.fillStyle=mode==='business'?'#171513':'#fff';
   round(ctx,qrX,qrY,qrSize,qrSize,12);
   ctx.fill();
   ctx.strokeStyle=template.accent;
