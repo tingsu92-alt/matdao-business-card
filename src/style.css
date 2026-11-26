@@ -107,3 +107,5 @@ details .designer-fields{margin:12px 0}
 @media(max-width:720px),(hover:none) and (pointer:coarse){input,select,.optional-fields textarea{font-size:16px;min-height:44px}input,select,textarea,.fields>label{min-width:0}.fields>label,.role-field{max-width:100%}}
 
 .language-fields{grid-template-columns:repeat(2,minmax(0,1fr))}.language-fields .contact{grid-column:1/-1}@media(max-width:440px){.language-fields{grid-template-columns:1fr}}
+
+.preview-head{flex-wrap:wrap}.preview-head .switch{flex-shrink:0}.preview-head .switch button{min-height:40px}@media(max-width:440px){.preview-head{align-items:flex-start}.preview-head .switch{width:100%;display:flex}.preview-head .switch button{flex:1}}

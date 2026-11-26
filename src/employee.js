@@ -1,4 +1,4 @@
-const templates = TEMPLATES ?? DEFAULTS;
+const templates = withTemplateDefaults(TEMPLATES ?? DEFAULTS);
 const form = $('card-form');
 const render = Object.fromEntries(Object.keys(LANGUAGES).map(language=>[language,makeRenderer($('card-'+language))]));
 const sample = {zh:SAMPLE,en:EN_SAMPLE};

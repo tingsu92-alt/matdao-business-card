@@ -27,7 +27,7 @@ function validToken(value){
 function validate(payload){
   if(payload.version!==2||!payload.templates||typeof payload.baseRevision!=='string')throw new Error('无效的模板数据。');
   const clean={version:2,templates:{}};
-  for(const mode of ['business','regular']){
+  for(const mode of ['business','regular','brandRed']){
     const item=payload.templates[mode],result={};
     if(!item||typeof item!=='object')throw new Error('缺少模板。');
     for(const key of ['company','address','slogan','companyEn','addressEn','sloganEn']){

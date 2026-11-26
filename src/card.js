@@ -1,5 +1,5 @@
 const WIDTH = 1680, HEIGHT = 960;
-const MODES = { business: '商务版', regular: '常规版' };
+const MODES = { regular: '常规版', business: '商务版', brandRed: '品牌红' };
 const SAMPLE = {name:'姓名', role:'职位', phone:'138 0000 0000', email:'name@example.com', affiliation:'可信数据空间发展联盟 新材料特设组组长'};
 const EN_SAMPLE = {name:'Name', role:'Title', phone:SAMPLE.phone, email:SAMPLE.email, affiliation:'Chair of the New Materials Task Force, Trusted Data Space Development Alliance'};
 const LANGUAGES = {zh:'中文', en:'英文'};
@@ -25,6 +25,14 @@ const DEFAULTS = {
   regular:{...BRAND,ink:'#242424',muted:'#575757',accent:'#404040',radius:68,background:'',logo:DEFAULT_REGULAR_LOGO,qr:DEFAULT_QR,layout:DEFAULT_LAYOUT}
 };
 const TEMPLATES = /*__TEMPLATES__*/ null;
+// Keep backups containing only the original two styles compatible.
+function withTemplateDefaults(source=DEFAULTS){
+  const regular=source.regular??DEFAULTS.regular;
+  return {...DEFAULTS,...source,brandRed:source.brandRed??{
+    ...regular,ink:'#ffffff',muted:'#ffe3e8',accent:'#ffffff',background:'',logo:DEFAULT_LOGO,
+    layout:structuredClone(regular.layout)
+  }};
+}
 const $ = (id) => document.getElementById(id);
 const assets = new Map();
 function getImage(src) {
@@ -49,11 +57,11 @@ function fitImage(ctx,img,x,y,w,h,cover=false) {
   ctx.drawImage(img,x+(cover||h===w?(w-width)/2:0),y+(h-height)/2,width,height);
 }
 function demoBackground(ctx, mode) {
-  const dark = mode==='business';
+  const dark = mode==='business', red=mode==='brandRed';
   const grad = ctx.createLinearGradient(0,HEIGHT,WIDTH,0);
-  grad.addColorStop(0,dark?'#080808':'#ffffff');
-  grad.addColorStop(.57,dark?'#17130f':'#fffdfd');
-  grad.addColorStop(1,dark?'#302419':'#fff2f4');
+  grad.addColorStop(0,dark?'#080808':red?'#ad0923':'#ffffff');
+  grad.addColorStop(.57,dark?'#17130f':red?'#d30d2b':'#fffdfd');
+  grad.addColorStop(1,dark?'#302419':red?'#ed2441':'#fff2f4');
   ctx.fillStyle=grad;
   ctx.fillRect(0,0,WIDTH,HEIGHT);
   const glow=ctx.createRadialGradient(1500,120,0,1500,120,850);
@@ -62,7 +70,7 @@ function demoBackground(ctx, mode) {
   ctx.fillStyle=glow;
   ctx.fillRect(0,0,WIDTH,HEIGHT);
   ctx.lineWidth=2;
-  ctx.strokeStyle=dark?'#d8ad6733':'#ff112d10';
+  ctx.strokeStyle=dark?'#d8ad6733':red?'#ffffff24':'#ff112d10';
   for(let i=0;i<17;i++){
     ctx.beginPath();
     ctx.moveTo(700+i*31,990);
@@ -152,7 +160,7 @@ async function renderCard(ctx, mode, template, data, language='zh') {
   const l=template.layout;
   const box = ([x,y,w,h]) => [WIDTH*x/100,HEIGHT*y/100,WIDTH*w/100,HEIGHT*h/100];
   if(logo){
-    if(mode==='business'){
+    if(mode==='business'||mode==='brandRed'){
       const [x,y,width,height]=box(l.logo);
       const layer=document.createElement('canvas');
       layer.width=Math.ceil(width);

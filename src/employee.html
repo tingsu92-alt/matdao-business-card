@@ -12,7 +12,7 @@
 <main>
 <section class="hero" aria-labelledby="title">
 <div><div class="kicker">CARD STUDIO</div><h1 id="title">新材道电子名片</h1><p>填写个人信息，预览并下载你的电子名片。</p></div>
-<div class="switch" role="group" aria-label="名片版本"><button data-mode="regular" aria-pressed="true">常规版</button><button data-mode="business" aria-pressed="false">商务版</button></div>
+
 </section>
 <section class="panel" aria-labelledby="info-title">
 <div class="panel-head"><div class="heading"><span class="step">01</span><h2 id="info-title">填写个人信息</h2></div><span class="meta">按下载语言填写</span></div>
@@ -41,7 +41,7 @@
 </form>
 </section>
 <section class="panel" aria-labelledby="preview-title">
-<div class="panel-head"><div class="heading"><span class="step">02</span><h2 id="preview-title">名片预览</h2></div><span id="preview-state" class="pill live">中英双语</span></div>
+<div class="panel-head preview-head"><div class="heading"><span class="step">02</span><h2 id="preview-title">名片预览</h2></div><div class="switch" role="group" aria-label="名片版本"><button data-mode="regular" aria-pressed="true">常规版</button><button data-mode="business" aria-pressed="false">商务版</button><button data-mode="brandRed" aria-pressed="false">品牌红</button></div></div>
 <div class="stage paired-stage">
 <figure><figcaption><strong>中文名片</strong><span id="zh-state">示例</span></figcaption><canvas id="card-zh" width="1680" height="960" aria-label="中文名片预览"></canvas></figure>
 <figure><figcaption><strong>英文名片</strong><span id="en-state">示例</span></figcaption><canvas id="card-en" width="1680" height="960" aria-label="英文名片预览"></canvas></figure>

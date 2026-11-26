@@ -7,12 +7,13 @@ const uploadTargets=[
   {id:'qr',key:'qr'},
   {id:'logo-business',key:'logo',version:'business'},
   {id:'logo-regular',key:'logo',version:'regular'},
+  {id:'logo-brand-red',key:'logo',version:'brandRed'},
 ];
 const editable=[...textKeys,...colorKeys,'radius'];
 const elementNames={logo:'Logo / 品牌简称',company:'公司全称',affiliation:'其他信息',name:'姓名',role:'职位',phone:'电话',email:'邮箱',address:'中文地址',addressEn:'英文地址',slogan:'口号',qr:'二维码'};
 const limits=[[0,99],[0,99],[3,100],[1,100]];
 const maxBytes=4*1024*1024;
-let templates=Object.fromEntries(Object.entries(TEMPLATES ?? DEFAULTS).map(([key,template])=>[key,structuredClone(template)]));
+let templates=Object.fromEntries(Object.entries(withTemplateDefaults(TEMPLATES ?? DEFAULTS)).map(([key,template])=>[key,structuredClone(template)]));
 let mode='business', busy=0;
 const renderZh=makeRenderer($('card-zh'));
 const renderEn=makeRenderer($('card-en'));
@@ -176,19 +177,19 @@ $('restore').addEventListener('change',async ()=>{
     if(file.size>35*1024*1024) throw new Error('备份过大');
     const payload=JSON.parse(await file.text());
     if(![1,2].includes(payload.version)) throw new Error('版本');
-    const loaded=Object.fromEntries(Object.keys(MODES).map(key=>[key,readTemplate(payload.templates[key],payload.version)]));
+    const loaded=Object.fromEntries(Object.keys(MODES).map(key=>[key,readTemplate(withTemplateDefaults(payload.templates)[key],payload.version)]));
     assets.clear();
     const pictures=await Promise.all(Object.values(loaded).flatMap(entry=>imageKeys.map(key=>entry[key])).filter(Boolean).map(getImage));
     if(pictures.some(picture=>!picture)) throw new Error('损坏的图片');
     for(const target of uploadTargets) $(target.id).value='';
     templates=loaded;
     sync();
-    status(payload.version===1?'已恢复旧版素材和文案，并套用新版排版。':'两版模板已恢复。');
+    status(payload.version===1?'已恢复旧版素材和文案，并套用新版排版。':'三版模板已恢复。');
   }catch{status('无法导入，请选择有效的名片模板备份。',true);}
   finally{$('restore').value='';working(-1);}
 });
 $('publish').addEventListener('click',async()=>{
-  if(!window.confirm('将当前两套模板保存到 GitHub 并更新员工网页？')) return;
+  if(!window.confirm('将当前三套模板保存到 GitHub 并更新员工网页？')) return;
   working(1);
   status('正在保存并发布，请稍候。');
   try{

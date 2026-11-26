@@ -13,8 +13,8 @@
 </div></header>
 <main>
 <section class="hero" aria-labelledby="title">
-<div><div class="kicker">TEMPLATE STUDIO</div><h1 id="title">设计师配置</h1><p>分别配置两套样式，每套样式共用一组配色和素材，可单独设置中英文文案。</p></div>
-<div class="switch" role="group" aria-label="编辑名片版本"><button data-mode="business" aria-pressed="true">商务版</button><button data-mode="regular" aria-pressed="false">常规版</button></div>
+<div><div class="kicker">TEMPLATE STUDIO</div><h1 id="title">设计师配置</h1><p>分别配置三套样式，每套样式共用一组配色和素材，可单独设置中英文文案。</p></div>
+<div class="switch" role="group" aria-label="编辑名片版本"><button data-mode="business" aria-pressed="true">商务版</button><button data-mode="regular" aria-pressed="false">常规版</button><button data-mode="brandRed" aria-pressed="false">品牌红</button></div>
 </section>
 <div class="designer-grid">
 <section class="panel" aria-labelledby="settings-title">
@@ -27,6 +27,8 @@
 <div class="logo-thumbnail wide" id="logo-business-state" hidden><img id="logo-business-thumbnail" alt="商务版 Logo 文件缩略图"></div>
 <div class="upload wide"><label>常规版 Logo<input type="file" id="logo-regular" accept="image/png,image/jpeg,image/webp"></label><button class="secondary" type="button" data-remove="logo-regular" aria-label="移除常规版 Logo">移除</button></div>
 <div class="logo-thumbnail wide" id="logo-regular-state" hidden><img id="logo-regular-thumbnail" alt="常规版 Logo 文件缩略图"></div>
+<div class="upload wide"><label>品牌红 Logo<input type="file" id="logo-brand-red" accept="image/png,image/jpeg,image/webp"></label><button class="secondary" type="button" data-remove="logo-brand-red" aria-label="移除品牌红 Logo">移除</button></div>
+<div class="logo-thumbnail wide" id="logo-brand-red-state" hidden><img id="logo-brand-red-thumbnail" alt="品牌红 Logo 文件缩略图"></div>
 <div class="upload wide"><label>二维码<input type="file" id="qr" accept="image/png,image/jpeg,image/webp"></label><button class="secondary" type="button" data-remove="qr">移除</button></div>
 <label class="wide">公司全称<input id="company" maxlength="32"></label>
 <label class="wide">公司地址<input id="address" maxlength="90"></label>
@@ -36,7 +38,7 @@
 <label class="wide">英文公司口号<input id="sloganEn" maxlength="90"></label>
 <label>主文字颜色<input id="ink" type="color"></label>
 <label>辅助文字颜色<input id="muted" type="color"></label>
-<label>强调色（商务版同步 Logo）<input id="accent" type="color"></label>
+<label>强调色（商务版、品牌红同步 Logo）<input id="accent" type="color"></label>
 <label>圆角半径（0–120 px）<input id="radius" type="number" min="0" max="120" step="1"></label>
 </div>
 <details><summary>调整元素的位置和大小</summary>
