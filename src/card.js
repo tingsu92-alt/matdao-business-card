@@ -1,4 +1,5 @@
 const WIDTH = 1680, HEIGHT = 960;
+function cardDimensions(mode){return {width:mode==='business'?1800:WIDTH,height:HEIGHT};}
 const MODES = { brandRed: '品牌红', regular: '常规白', business: '商务黑' };
 const SAMPLE = {name:'姓名', role:'职位', phone:'138 0000 0000', email:'name@example.com', affiliation:'可信数据空间发展联盟 新材料特设组组长'};
 const EN_SAMPLE = {name:'Name', role:'Title', phone:SAMPLE.phone, email:SAMPLE.email, affiliation:'Chair of the New Materials Task Force, Trusted Data Space Development Alliance'};
@@ -21,7 +22,7 @@ const DEFAULT_LOGO = /*__DEFAULT_LOGO__*/ '';
 const DEFAULT_REGULAR_LOGO = /*__DEFAULT_REGULAR_LOGO__*/ '';
 const DEFAULT_QR = /*__DEFAULT_QR__*/ '';
 const DEFAULTS = {
-  business:{...BRAND,ink:'#e7be79',muted:'#e7be79',accent:'#e7be79',radius:68,background:'',logo:DEFAULT_LOGO,qr:DEFAULT_QR,layout:DEFAULT_LAYOUT},
+  business:{...BRAND,ink:'#e7be79',muted:'#e7be79',accent:'#e7be79',radius:0,background:'',logo:DEFAULT_LOGO,qr:DEFAULT_QR,layout:DEFAULT_LAYOUT},
   regular:{...BRAND,ink:'#242424',muted:'#575757',accent:'#404040',radius:68,background:'',logo:DEFAULT_REGULAR_LOGO,qr:DEFAULT_QR,layout:DEFAULT_LAYOUT}
 };
 const TEMPLATES = /*__TEMPLATES__*/ null;
@@ -74,9 +75,26 @@ function fitBrandLogos(ctx,img,source,x,y,w,h){
     x+split*factor+thirdWidth*(1-ratio)/2,top+height*(1-ratio)/2,
     thirdWidth*ratio,height*ratio);
 }
-function demoBackground(ctx, mode) {
-  ctx.fillStyle=mode==='business'?'#171513':mode==='brandRed'?'#e5222a':'#ffffff';
-  ctx.fillRect(0,0,WIDTH,HEIGHT);
+function demoBackground(ctx, mode, width=WIDTH) {
+  if(mode!=='business'){
+    ctx.fillStyle=mode==='brandRed'?'#e5222a':'#ffffff';
+    ctx.fillRect(0,0,width,HEIGHT);return;
+  }
+  const base=ctx.createLinearGradient(0,0,width,HEIGHT*.7);
+  base.addColorStop(0,'#2c2c2c');base.addColorStop(.28,'#252525');
+  base.addColorStop(.62,'#292929');base.addColorStop(1,'#202020');
+  ctx.fillStyle=base;ctx.fillRect(0,0,width,HEIGHT);
+  const sheen=ctx.createLinearGradient(width*.05,0,width*.85,HEIGHT);
+  sheen.addColorStop(0,'rgba(255,255,255,0)');
+  sheen.addColorStop(.35,'rgba(255,255,255,0)');
+  sheen.addColorStop(.55,'rgba(255,255,255,.025)');
+  sheen.addColorStop(.78,'rgba(255,255,255,0)');
+  sheen.addColorStop(1,'rgba(255,255,255,0)');
+  ctx.fillStyle=sheen;ctx.fillRect(0,0,width,HEIGHT);
+  ctx.lineWidth=1.5;ctx.strokeStyle='rgba(255,255,255,.1)';
+  ctx.beginPath();ctx.moveTo(.75,HEIGHT-.75);ctx.lineTo(.75,.75);ctx.lineTo(width-.75,.75);ctx.stroke();
+  ctx.strokeStyle='rgba(0,0,0,.22)';
+  ctx.beginPath();ctx.moveTo(width-.75,.75);ctx.lineTo(width-.75,HEIGHT-.75);ctx.lineTo(.75,HEIGHT-.75);ctx.stroke();
 }
 function setFont(ctx,weight,size){
   ctx.font=weight+' '+size+'px "PingFang SC", "Microsoft YaHei", system-ui, sans-serif';
@@ -151,12 +169,14 @@ async function renderCard(ctx, mode, template, data, language='zh') {
   const address=language==='en'?template.addressEn:template.address;
   const slogan=language==='en'?template.sloganEn:template.slogan;
   const [background,logo,qr]=await Promise.all([getImage(template.background),getImage(template.logo),getImage(template.qr)]);
-  ctx.clearRect(0,0,WIDTH,HEIGHT);
+  const size=cardDimensions(mode);
+  ctx.clearRect(0,0,size.width,size.height);
   ctx.save();
-  round(ctx,0,0,WIDTH,HEIGHT,template.radius);
+  round(ctx,0,0,size.width,size.height,template.radius);
   ctx.clip();
-  demoBackground(ctx,mode);
-  if(background) fitImage(ctx,background,0,0,WIDTH,HEIGHT,true);
+  demoBackground(ctx,mode,size.width);
+  if(background) fitImage(ctx,background,0,0,size.width,size.height,true);
+  ctx.translate((size.width-WIDTH)/2,0);
   const l=template.layout;
   const box = ([x,y,w,h]) => [WIDTH*x/100,HEIGHT*y/100,WIDTH*w/100,HEIGHT*h/100];
   if(logo){
@@ -185,7 +205,7 @@ async function renderCard(ctx, mode, template, data, language='zh') {
     ctx.fillStyle=template.accent;
     round(ctx,x,y+h*.1,s,s,s*.22);
     ctx.fill();
-    ctx.strokeStyle=mode==='business'?'#171513':'#fff';
+    ctx.strokeStyle=mode==='business'?'#262626':'#fff';
     ctx.lineWidth=s*.075;
     ctx.beginPath();
     ctx.moveTo(x+s*.22,y+h*.1+s*.63);
@@ -237,12 +257,12 @@ function makeRenderer(canvas){
   return async (mode,template,data,language)=>{
     const revision=++sequence;
     const frame=document.createElement('canvas');
-    frame.width=WIDTH;
+    frame.width=cardDimensions(mode).width;
     frame.height=HEIGHT;
     await renderCard(frame.getContext('2d'),mode,template,data,language);
     if(revision===sequence){
+      canvas.width=frame.width;canvas.height=frame.height;
       const ctx=canvas.getContext('2d');
-      ctx.clearRect(0,0,WIDTH,HEIGHT);
       ctx.drawImage(frame,0,0);
     }
   };
