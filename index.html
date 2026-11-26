@@ -241,6 +241,23 @@ function fitImage(ctx,img,x,y,w,h,cover=false) {
   const width=img.width*factor, height=img.height*factor;
   ctx.drawImage(img,x+(cover||h===w?(w-width)/2:0),y+(h-height)/2,width,height);
 }
+function fitBrandLogos(ctx,img,source,x,y,w,h){
+  if(source!==DEFAULT_LOGO&&source!==DEFAULT_REGULAR_LOGO){
+    fitImage(ctx,img,x,y,w,h);return;
+  }
+  ctx.imageSmoothingQuality='high';
+  const factor=Math.min(w/img.width,h/img.height);
+  const height=img.height*factor,top=y+(h-height)/2;
+  const split=1360,thirdWidth=(img.width-split)*factor;
+  // Preserve TDSA and CISRI exactly; reduce only Matdao around its center.
+  ctx.save();ctx.beginPath();ctx.rect(x,top,(split-40)*factor,height);ctx.clip();
+  fitImage(ctx,img,x,y,w,h);
+  ctx.restore();
+  const ratio=.95;
+  ctx.drawImage(img,split,0,img.width-split,img.height,
+    x+split*factor+thirdWidth*(1-ratio)/2,top+height*(1-ratio)/2,
+    thirdWidth*ratio,height*ratio);
+}
 function demoBackground(ctx, mode) {
   ctx.fillStyle=mode==='business'?'#171513':mode==='brandRed'?'#e5222a':'#ffffff';
   ctx.fillRect(0,0,WIDTH,HEIGHT);
@@ -335,7 +352,7 @@ async function renderCard(ctx, mode, template, data, language='zh') {
       layer.height=Math.ceil(height*scale);
       const logoContext=layer.getContext('2d');
       logoContext.scale(scale,scale);
-      fitImage(logoContext,logo,0,0,width,height);
+      fitBrandLogos(logoContext,logo,template.logo,0,0,width,height);
       logoContext.globalCompositeOperation='source-in';
       logoContext.fillStyle=template.accent;
       logoContext.fillRect(0,0,layer.width,layer.height);
@@ -343,7 +360,7 @@ async function renderCard(ctx, mode, template, data, language='zh') {
       ctx.imageSmoothingQuality='high';
       ctx.drawImage(layer,x,y,width,height);
     }else{
-      fitImage(ctx,logo,...box(l.logo));
+      fitBrandLogos(ctx,logo,template.logo,...box(l.logo));
     }
   }
   else if(company){
