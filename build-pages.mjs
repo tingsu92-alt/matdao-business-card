@@ -19,7 +19,7 @@ return read('employee.html')
   .replace('<!--__DESIGNER_LINK__-->', '')
   .replace('/*__CSS__*/', () => read('style.css'))
   .replace('/*__CARD__*/', () => cardSource(templates))
-  .replace('/*__PAGE__*/', () => read('zip.js') + '\n' + read('employee.js').replace("/*__METAL_BACKGROUND__*/ ''",()=>JSON.stringify(image('business-metallic-background-v1.jpg'))));
+  .replace('/*__PAGE__*/', () => read('zip.js') + '\n' + read('employee.js').replace("/*__METAL_BACKGROUND__*/ ''",()=>JSON.stringify(image('business-metallic-background-v2.jpg'))));
 }
 export function buildDesigner(session,revision){
   return read('designer.html')

@@ -2,7 +2,7 @@ const templates = withTemplateDefaults(TEMPLATES ?? DEFAULTS);
 const form = $('card-form');
 const previewSequence={zh:0,en:0};
 const FRAME_WIDTH=1800,FRAME_HEIGHT=1120;
-const PRESENTATION={regular:{color:'#e7e9ec',label:'浅灰衬底'},brandRed:{color:'#232326',label:'炭黑衬底'},business:{color:'#85898d',label:'金属质感衬底'}};
+const PRESENTATION={regular:{color:'#e7e9ec',label:'浅灰衬底'},brandRed:{color:'#232326',label:'炭黑衬底'},business:{color:'#55585c',label:'流线金属衬底'}};
 const METAL_BACKGROUND=/*__METAL_BACKGROUND__*/ '';
 let exportFormat='png';
 const sample = {zh:SAMPLE,en:EN_SAMPLE};
