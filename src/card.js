@@ -11,7 +11,7 @@ const BRAND = {
   slogan:'',sloganEn:'',
 };
 const DEFAULT_LAYOUT = {
-  logo:[7,9,46,9], name:[7,44,56,8.5], role:[7,57,56,4.7],
+  logo:[7,9,40.48,7.92], name:[7,44,56,8.5], role:[7,57,56,4.7],
   company:[7,69,56,4.1], affiliation:[7,76,56,3.5],
   phone:[65,59,28,3.85], email:[65,65,28,3.6],
   address:[65,72,28,3.6], addressEn:[65,72,28,3.25],
@@ -52,12 +52,13 @@ function round(ctx,x,y,w,h,r) {
   ctx.roundRect(x,y,w,h,r);
 }
 function fitImage(ctx,img,x,y,w,h,cover=false) {
+  ctx.imageSmoothingQuality='high';
   const factor=(cover?Math.max:Math.min)(w/img.width,h/img.height);
   const width=img.width*factor, height=img.height*factor;
   ctx.drawImage(img,x+(cover||h===w?(w-width)/2:0),y+(h-height)/2,width,height);
 }
 function demoBackground(ctx, mode) {
-  ctx.fillStyle=mode==='business'?'#171513':mode==='brandRed'?'#ff112d':'#ffffff';
+  ctx.fillStyle=mode==='business'?'#171513':mode==='brandRed'?'#d51e38':'#ffffff';
   ctx.fillRect(0,0,WIDTH,HEIGHT);
 }
 function setFont(ctx,weight,size){
@@ -145,21 +146,18 @@ async function renderCard(ctx, mode, template, data, language='zh') {
     if(mode==='business'||mode==='brandRed'){
       const [x,y,width,height]=box(l.logo);
       const layer=document.createElement('canvas');
-      layer.width=Math.ceil(width);
-      layer.height=Math.ceil(height);
+      const scale=3;
+      layer.width=Math.ceil(width*scale);
+      layer.height=Math.ceil(height*scale);
       const logoContext=layer.getContext('2d');
+      logoContext.scale(scale,scale);
       fitImage(logoContext,logo,0,0,width,height);
-      // AI assets can have slightly translucent fills. Keep solid logo areas
-      // opaque so the displayed gold matches the position text exactly.
-      const pixels=logoContext.getImageData(0,0,layer.width,layer.height);
-      for(let offset=3;offset<pixels.data.length;offset+=4){
-        if(pixels.data[offset]>=220) pixels.data[offset]=255;
-      }
-      logoContext.putImageData(pixels,0,0);
       logoContext.globalCompositeOperation='source-in';
       logoContext.fillStyle=template.accent;
       logoContext.fillRect(0,0,layer.width,layer.height);
-      ctx.drawImage(layer,x,y);
+      ctx.imageSmoothingEnabled=true;
+      ctx.imageSmoothingQuality='high';
+      ctx.drawImage(layer,x,y,width,height);
     }else{
       fitImage(ctx,logo,...box(l.logo));
     }
