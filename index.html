@@ -242,7 +242,7 @@ function fitImage(ctx,img,x,y,w,h,cover=false) {
   ctx.drawImage(img,x+(cover||h===w?(w-width)/2:0),y+(h-height)/2,width,height);
 }
 function demoBackground(ctx, mode) {
-  ctx.fillStyle=mode==='business'?'#171513':mode==='brandRed'?'#d51e38':'#ffffff';
+  ctx.fillStyle=mode==='business'?'#171513':mode==='brandRed'?'#e5222a':'#ffffff';
   ctx.fillRect(0,0,WIDTH,HEIGHT);
 }
 function setFont(ctx,weight,size){
