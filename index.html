@@ -159,13 +159,12 @@ details .designer-fields{margin:12px 0}
 <section class="panel" aria-labelledby="preview-title">
 <div class="panel-head preview-head"><div class="heading"><span class="step">02</span><h2 id="preview-title">名片预览</h2></div><div class="switch" role="group" aria-label="名片版本"><button data-mode="regular" aria-pressed="true">常规版</button><button data-mode="business" aria-pressed="false">商务版</button><button data-mode="brandRed" aria-pressed="false">品牌红</button></div></div>
 <div class="stage paired-stage zh-only" id="preview-stage">
-<figure><figcaption><strong>中文名片</strong><span id="zh-state">示例</span></figcaption><canvas id="card-zh" width="1680" height="960" aria-label="中文名片预览"></canvas></figure>
-<figure id="en-preview" hidden><figcaption><strong>英文名片</strong><span id="en-state">示例</span></figcaption><canvas id="card-en" width="1680" height="960" aria-label="英文名片预览"></canvas></figure>
-<p class="caption"><span id="mode-label">常规版</span><span>1680 × 960 px / 张</span></p>
+<figure><canvas id="card-zh" width="1680" height="960" aria-label="中文名片预览"></canvas></figure>
+<figure id="en-preview" hidden><canvas id="card-en" width="1680" height="960" aria-label="英文名片预览"></canvas></figure>
 </div>
 <div class="export-bar">
 <div class="download-options"><label for="download-language">下载语言</label><select id="download-language"><option value="zh">中文</option><option value="en">英文</option><option value="both">中英都要</option></select></div>
-<p class="note" id="export-note">PNG 图片保留透明圆角。</p>
+<p class="note" id="export-note">PNG · 1680 × 960 px · 透明圆角</p>
 <button class="secondary" id="save-phone" type="button">保存到手机</button>
 <button class="primary" id="download" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m-4-4 4 4 4-4M5 16v4h14v-4"/></svg><span id="download-label">下载 PNG</span></button>
 </div>
@@ -498,7 +497,6 @@ function status(message,style=''){
   $('form-status').className='note '+style;
 }
 function preview(){
-  $('mode-label').textContent=MODES[mode];
   const hasEnglish=Boolean(value('nameEn')||value('roleEn')||(editedEnglish.has('affiliationEn')&&value('affiliationEn')));
   $('en-preview').hidden=!hasEnglish;
   $('preview-stage').classList.toggle('zh-only',!hasEnglish);
@@ -506,7 +504,6 @@ function preview(){
     if(language==='en'&&!hasEnglish) continue;
     const data=values(language);
     const demo=!data.name&&!data.role;
-    $(language+'-state').textContent=demo?'示例':'实时';
     void render[language](mode,templates[mode],demo?{...sample[language],affiliation:data.affiliation,phone:data.phone||sample[language].phone,email:data.email||sample[language].email}:data,language);
   }
 }
@@ -538,7 +535,7 @@ choice.addEventListener('change',()=>{
   const both=choice.value==='both';
   if(choice.value==='en'||both) $('english-fields').open=true;
   $('download-label').textContent=both?'下载 ZIP':'下载 PNG';
-  $('export-note').textContent=both?'ZIP 内含两张透明圆角 PNG。':'PNG 图片保留透明圆角。';
+  $('export-note').textContent=both?'2 张 PNG · 1680 × 960 px/张 · ZIP':'PNG · 1680 × 960 px · 透明圆角';
   status(idle);
 });
 

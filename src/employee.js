@@ -22,7 +22,6 @@ function status(message,style=''){
   $('form-status').className='note '+style;
 }
 function preview(){
-  $('mode-label').textContent=MODES[mode];
   const hasEnglish=Boolean(value('nameEn')||value('roleEn')||(editedEnglish.has('affiliationEn')&&value('affiliationEn')));
   $('en-preview').hidden=!hasEnglish;
   $('preview-stage').classList.toggle('zh-only',!hasEnglish);
@@ -30,7 +29,6 @@ function preview(){
     if(language==='en'&&!hasEnglish) continue;
     const data=values(language);
     const demo=!data.name&&!data.role;
-    $(language+'-state').textContent=demo?'示例':'实时';
     void render[language](mode,templates[mode],demo?{...sample[language],affiliation:data.affiliation,phone:data.phone||sample[language].phone,email:data.email||sample[language].email}:data,language);
   }
 }
@@ -62,7 +60,7 @@ choice.addEventListener('change',()=>{
   const both=choice.value==='both';
   if(choice.value==='en'||both) $('english-fields').open=true;
   $('download-label').textContent=both?'下载 ZIP':'下载 PNG';
-  $('export-note').textContent=both?'ZIP 内含两张透明圆角 PNG。':'PNG 图片保留透明圆角。';
+  $('export-note').textContent=both?'2 张 PNG · 1680 × 960 px/张 · ZIP':'PNG · 1680 × 960 px · 透明圆角';
   status(idle);
 });
 
