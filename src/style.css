@@ -114,3 +114,5 @@ details .designer-fields{margin:12px 0}
 .employee-page #english-fields summary span{color:var(--ink)}
 .paired-stage.zh-only{grid-template-columns:minmax(0,1fr)}
 .paired-stage.zh-only figure{width:min(100%,720px);justify-self:center}
+
+.export-format{display:flex;flex-shrink:0;gap:4px;padding:4px;background:#f1eff0;border-radius:9px}.export-format button{border:0;border-radius:6px;padding:8px 10px;background:none;color:#5c5c5c;font-size:13px;white-space:nowrap}.export-format button[aria-pressed="true"]{background:#fff;color:var(--brand);font-weight:650;box-shadow:0 1px 4px #24101517}.square-preview canvas{filter:none}.square-preview.zh-only figure{width:min(100%,640px)}@media(max-width:720px){.export-format{flex-basis:100%}.export-format button{flex:1;min-height:40px}.export-bar #export-note{margin:0}.export-bar #save-phone{margin-left:auto}}

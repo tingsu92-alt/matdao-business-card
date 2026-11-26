@@ -1,6 +1,9 @@
 const templates = withTemplateDefaults(TEMPLATES ?? DEFAULTS);
 const form = $('card-form');
-const render = Object.fromEntries(Object.keys(LANGUAGES).map(language=>[language,makeRenderer($('card-'+language))]));
+const previewSequence={zh:0,en:0};
+const SQUARE_SIZE=1800;
+const PRESENTATION={regular:{color:'#e7e9ec',label:'浅灰衬底'},brandRed:{color:'#232326',label:'炭黑衬底'},business:{color:'#7a2937',label:'酒红衬底'}};
+let exportFormat='png';
 const sample = {zh:SAMPLE,en:EN_SAMPLE};
 const names = {zh:['name','role'],en:['nameEn','roleEn']};
 const affiliations = {zh:'affiliation',en:'affiliationEn'};
@@ -23,15 +26,17 @@ function status(message,style=''){
 }
 function preview(){
   const bilingual=hasEnglish();
-  $('download-label').textContent=bilingual?'下载中英双版 ZIP':'下载中文 PNG';
-  $('export-note').textContent=bilingual?'2 张 PNG · 1680 × 960 px/张 · ZIP':'PNG · 1680 × 960 px · 透明圆角';
+  const label=exportFormat==='jpg'?'JPG':'PNG';
+  $('download-label').textContent=bilingual?'下载中英双版 '+label+' ZIP':'下载中文 '+label;
+  $('export-note').textContent=(bilingual?'2 张 · ':'')+(exportFormat==='jpg'?'JPG · 1800 × 1800 px · '+PRESENTATION[mode].label:'PNG · 1680 × 960 px · 透明圆角');
+  $('preview-stage').classList.toggle('square-preview',exportFormat==='jpg');
   $('en-preview').hidden=!bilingual;
   $('preview-stage').classList.toggle('zh-only',!bilingual);
   for(const language of Object.keys(LANGUAGES)){
     if(language==='en'&&!bilingual) continue;
     const data=values(language);
     const demo=!data.name&&!data.role;
-    void render[language](mode,templates[mode],demo?{...sample[language],affiliation:data.affiliation,phone:data.phone||sample[language].phone,email:data.email||sample[language].email}:data,language);
+    void renderPreview(language,mode,exportFormat,demo?{...sample[language],affiliation:data.affiliation,phone:data.phone||sample[language].phone,email:data.email||sample[language].email}:data);
   }
 }
 function check(languages){
@@ -58,21 +63,51 @@ form.addEventListener('input',event=>{
 });
 form.addEventListener('submit',event=>event.preventDefault());
 bindSwitch(next=>{mode=next;preview();});
-async function makePng(version,language,data){
-  const canvas=document.createElement('canvas');
-  canvas.width=WIDTH;
-  canvas.height=HEIGHT;
-  await renderCard(canvas.getContext('2d'),version,templates[version],data,language);
-  const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/png'));
-  if(!blob) throw new Error('PNG');
-  return blob;
+document.querySelectorAll('[data-format]').forEach(button=>button.addEventListener('click',()=>{
+  exportFormat=button.dataset.format;
+  document.querySelectorAll('[data-format]').forEach(item=>item.setAttribute('aria-pressed',String(item===button)));
+  status(idle);preview();
+}));
+async function imageCanvas(version,language,data,format){
+  const card=document.createElement('canvas');
+  card.width=WIDTH;card.height=HEIGHT;
+  await renderCard(card.getContext('2d'),version,templates[version],data,language);
+  if(format==='png') return card;
+  const square=document.createElement('canvas');
+  square.width=square.height=SQUARE_SIZE;
+  const ctx=square.getContext('2d');
+  ctx.fillStyle=PRESENTATION[version].color;
+  ctx.fillRect(0,0,SQUARE_SIZE,SQUARE_SIZE);
+  const width=SQUARE_SIZE*.84,height=width*HEIGHT/WIDTH;
+  const x=(SQUARE_SIZE-width)/2,y=(SQUARE_SIZE-height)/2;
+  ctx.save();
+  ctx.imageSmoothingQuality='high';
+  ctx.shadowColor=version==='regular'?'rgba(20,24,30,.22)':'rgba(0,0,0,.38)';
+  ctx.shadowBlur=54;ctx.shadowOffsetY=28;
+  ctx.drawImage(card,x,y,width,height);
+  ctx.restore();
+  return square;
+}
+async function renderPreview(language,version,format,data){
+  const revision=++previewSequence[language];
+  try{
+    const image=await imageCanvas(version,language,data,format);
+    if(revision!==previewSequence[language]) return;
+    const canvas=$('card-'+language);
+    canvas.width=image.width;canvas.height=image.height;
+    canvas.getContext('2d').drawImage(image,0,0);
+  }catch{status('预览生成失败，请重试。','status-error');}
 }
 function safeName(name){return name.replace(/[\\/:*?"<>|]/g,'_');}
-async function pngFiles(version,languages){
+async function imageFiles(version,languages,format){
   return Promise.all(languages.map(async language=>{
     const data=values(language);
-    const filename=safeName(data.name)+'-新材道电子名片-'+MODES[version]+'-'+LANGUAGES[language]+'.png';
-    return {language,filename,blob:await makePng(version,language,data)};
+    const canvas=await imageCanvas(version,language,data,format);
+    const type=format==='jpg'?'image/jpeg':'image/png';
+    const blob=await new Promise(resolve=>canvas.toBlob(resolve,type,.95));
+    if(!blob) throw new Error('图片生成失败');
+    const filename=safeName(data.name)+'-新材道电子名片-'+MODES[version]+'-'+LANGUAGES[language]+(format==='jpg'?'-带背景.jpg':'.png');
+    return {language,filename,blob,type,format:format.toUpperCase(),width:canvas.width,height:canvas.height};
   }));
 }
 function imageDataUrl(blob){
@@ -86,35 +121,35 @@ function imageDataUrl(blob){
 const phoneDialog=$('phone-save');
 $('phone-save-close').addEventListener('click',()=>phoneDialog.close());
 $('save-phone').addEventListener('click',async()=>{
-  const languages=selected(),version=mode;
+  const languages=selected(),version=mode,format=exportFormat;
   if(!check(languages)) return;
   const button=$('save-phone');
   button.disabled=true;
   try{
-    const files=await pngFiles(version,languages);
+    const files=await imageFiles(version,languages,format);
     const images=await Promise.all(files.map(file=>imageDataUrl(file.blob)));
     $('phone-save-images').replaceChildren();
     $('phone-save-status').textContent='';
     files.forEach((file,index)=>{
       const figure=document.createElement('figure');
       const caption=document.createElement('figcaption');
-      caption.textContent=LANGUAGES[file.language]+' · PNG · '+WIDTH+' × '+HEIGHT+' px';
+      caption.textContent=LANGUAGES[file.language]+' · '+file.format+' · '+file.width+' × '+file.height+' px';
       const image=document.createElement('img');
       image.src=images[index];
       image.alt=LANGUAGES[file.language]+'名片保存图片';
-      image.width=WIDTH;image.height=HEIGHT;
+      image.width=file.width;image.height=file.height;
       const actions=document.createElement('div');
       actions.className='phone-save-actions';
-      const png=new File([file.blob],file.filename,{type:'image/png'});
+      const shareFile=new File([file.blob],file.filename,{type:file.type});
       let canShare=false;
-      try{canShare=Boolean(navigator.share&&navigator.canShare&&navigator.canShare({files:[png]}));}catch{}
+      try{canShare=Boolean(navigator.share&&navigator.canShare&&navigator.canShare({files:[shareFile]}));}catch{}
       if(canShare){
         const share=document.createElement('button');
         share.type='button';share.className='primary';share.textContent='分享'+LANGUAGES[file.language]+'图片';
         share.addEventListener('click',async()=>{
           share.disabled=true;
           try{
-            await navigator.share({files:[png]});
+            await navigator.share({files:[shareFile]});
             $('phone-save-status').textContent='分享菜单已关闭，请到相册确认是否已保存。';
           }catch(error){
             $('phone-save-status').textContent=error.name==='AbortError'?'已取消分享，可重新点击。':'当前浏览器未能打开系统分享，请在 Safari 中打开此网页后重试。';
@@ -127,7 +162,7 @@ $('save-phone').addEventListener('click',async()=>{
         figure.append(hint);
       }
       const download=document.createElement('button');
-      download.type='button';download.className='secondary';download.textContent='下载'+LANGUAGES[file.language]+' PNG 文件';
+      download.type='button';download.className='secondary';download.textContent='下载'+LANGUAGES[file.language]+' '+file.format+' 文件';
       download.addEventListener('click',()=>downloadFile(file.blob,file.filename));
       actions.append(download);
       figure.prepend(caption,image);figure.append(actions);
@@ -147,14 +182,14 @@ $('copy-page-link').addEventListener('click',async()=>{
   }
 });
 $('download').addEventListener('click',async ()=>{
-  const languages=selected(),version=mode;
+  const languages=selected(),version=mode,format=exportFormat;
   if(!check(languages)) return;
   const button=$('download');
   button.disabled=true;
   try{
-    const files=await pngFiles(version,languages);
+    const files=await imageFiles(version,languages,format);
     if(files.length===1) downloadFile(files[0].blob,files[0].filename);
-    else downloadFile(await zipPngs(files),'新材道电子名片-'+MODES[version]+'-中英双版.zip');
+    else downloadFile(await zipImages(files),'新材道电子名片-'+MODES[version]+'-中英双版-'+format.toUpperCase()+'.zip');
   }catch{
     status('名片生成失败，请重试。','status-error');
   }finally{

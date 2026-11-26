@@ -1,4 +1,4 @@
-// PNGs are already compressed. Store both as-is in one UTF-8 ZIP download.
+// PNG and JPEG images are already compressed; store both as-is in a UTF-8 ZIP.
 const crcTable=Uint32Array.from({length:256},(_,byte)=>{
   let crc=byte;
   for(let i=0;i<8;i++) crc=(crc>>>1)^((crc&1)?0xedb88320:0);
@@ -19,7 +19,7 @@ function zipHeader(size,signature,values){
   }
   return bytes;
 }
-async function zipPngs(files){
+async function zipImages(files){
   const encoder=new TextEncoder();
   const records=[], directory=[];
   let offset=0, directorySize=0;
