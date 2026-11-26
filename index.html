@@ -360,16 +360,16 @@ async function renderCard(ctx, mode, template, data, language='zh') {
     ctx.lineTo(x+s*.56,y+h*.1+s*.53);
     ctx.lineTo(x+s*.75,y+h*.1+s*.27);
     ctx.stroke();
-    writeLine(ctx,language==='en'?'MATDAO':'新材道',[(x+s*1.32)/WIDTH*100,y/HEIGHT*100+h/HEIGHT*22,(w-s*1.32)/WIDTH*100,l.logo[3]*.42],template.ink,'650');
+    writeLine(ctx,language==='en'?'MATDAO':'新材道',[(x+s*1.32)/WIDTH*100,y/HEIGHT*100+h/HEIGHT*22,(w-s*1.32)/WIDTH*100,l.logo[3]*.42],template.ink,'400');
   }
-  writeLine(ctx,data.name,l.name,template.ink,'750');
-  writeParagraphs(ctx,data.role,l.role,template.accent,'650',9);
-  writeLine(ctx,company,l.company,template.ink,'550');
-  writeParagraphs(ctx,data.affiliation,l.affiliation,template.muted,'450',Math.max(1,l.slogan[1]-l.affiliation[1]-1));
-  writeLine(ctx,data.phone,l.phone,template.ink,'450');
-  writeLine(ctx,data.email,l.email,template.ink,'450');
-  writeParagraphs(ctx,address,language==='en'?(l.addressEn??l.address):l.address,template.muted,'450',28);
-  writeLine(ctx,slogan,l.slogan,template.muted,'450');
+  writeLine(ctx,data.name,l.name,template.ink,'400');
+  writeParagraphs(ctx,data.role,l.role,template.accent,'400',9);
+  writeLine(ctx,company,l.company,template.ink,'400');
+  writeParagraphs(ctx,data.affiliation,l.affiliation,template.muted,'400',Math.max(1,l.slogan[1]-l.affiliation[1]-1));
+  writeLine(ctx,data.phone,l.phone,template.ink,'400');
+  writeLine(ctx,data.email,l.email,template.ink,'400');
+  writeParagraphs(ctx,address,language==='en'?(l.addressEn??l.address):l.address,template.muted,'400',28);
+  writeLine(ctx,slogan,l.slogan,template.muted,'400');
   const [qrX,qrY,qrWidth,qrHeight]=box(l.qr);
   const qrSize=Math.min(qrWidth,qrHeight);
   ctx.fillStyle=mode==='business'?'#171513':'#fff';
@@ -391,7 +391,7 @@ async function renderCard(ctx, mode, template, data, language='zh') {
     ctx.fillStyle=mode==='business'?'#766346':'#6b6b6b';
     ctx.textAlign='center';
     ctx.textBaseline='middle';
-    setFont(ctx,'550',qrSize*.12);
+    setFont(ctx,'400',qrSize*.12);
     ctx.fillText(language==='en'?'QR CODE':'二维码占位',qrX+qrSize/2,qrY+qrSize*.46);
     setFont(ctx,'400',qrSize*.073);
     ctx.fillText(language==='en'?'PLACEHOLDER':'待上传',qrX+qrSize/2,qrY+qrSize*.64);
